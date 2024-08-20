@@ -6,7 +6,7 @@ import { Category } from "src/app/models/category.model";
 @Injectable({
     providedIn: 'root'
 })
-export class CategoriaProvider extends GenericRequest<Category> {
+export class CategoryProvider extends GenericRequest<Category> {
     constructor(http: HttpClient){
         super(http,'Category');
     }
