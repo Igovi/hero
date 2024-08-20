@@ -1,0 +1,7 @@
+{
+  "name": "hero-list",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
