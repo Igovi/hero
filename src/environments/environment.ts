@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  url: 'candidato01.globalthings.net',
+  url: 'https://candidato01.globalthings.net/api/',
   apiKey: 'eeb9d033ba1949c3a40eb4152eb6a65f'
 };
 
