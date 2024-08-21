@@ -5,6 +5,7 @@ import { catchError, of, Subscription } from 'rxjs';
 import { DataService } from 'src/app/services/storage/data.service';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 
 @Component({
   selector: 'app-heroi',
@@ -17,7 +18,7 @@ export class HeroiPage implements OnInit {
   public isOnline: boolean = false;
   private networkStatusSubscription: Subscription;
 
-  totals:number = 0;
+  total:number = 0;
   skip:number = 0;
   take:number = 3;
 
@@ -60,7 +61,7 @@ export class HeroiPage implements OnInit {
     ).subscribe({
       next: (apiData: any) => {
         this.heroList = apiData.Items; 
-        this.totals = apiData.Totals;
+        this.total = apiData.Total;
         this.skip = this.take;
         this.dataService.saveData('heroList', this.heroList);
       },
@@ -90,4 +91,28 @@ export class HeroiPage implements OnInit {
     });
   }
 
+  loadMore(event: InfiniteScrollCustomEvent): void {
+    this.heroProvider.get(this.skip, this.take).pipe(
+      catchError((apiError: any) => {
+        console.log('Ocorreu um erro: ', apiError);
+        return of([]);
+      })
+    ).subscribe({
+      next: (apiData: any) => {
+        this.heroList = [...this.heroList, ...apiData.Items];
+        this.skip += this.take;
+        this.dataService.saveData('heroList', this.heroList);
+        if (this.heroList.length === this.total) {
+          event.target.disabled = true;
+        }
+        event.target.complete();
+      },
+      error: (apiError: any) => {
+        console.log('Unhandled error:', apiError);
+      }
+    });
+  }
+
 }
+
+

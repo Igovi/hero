@@ -1,8 +1,18 @@
 <ion-content [fullscreen]="true">
-  <app-header [hasArrow]="true"></app-header>
-  <ion-toolbar>
-    <ion-title *ngFor="let item of heroList" size="large">{{item.Name}}</ion-title>
-  </ion-toolbar>
+  <app-header [hasArrow]="false"></app-header>
+  <ion-content>
+    <ion-list>
+      <ion-item *ngFor="let item of heroList; let index">
+        <ion-avatar slot="start">
+          <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
+        </ion-avatar>
+        <ion-label>{{ item.Name }}</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingText="Please wait..." loadingSpinner="bubbles"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-content>
   <div *ngIf="isOnline; else offline">
     <p>You are online!</p>
   </div>
