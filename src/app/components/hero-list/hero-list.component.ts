@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
 import { catchError, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Hero } from 'src/app/models/hero.model';
@@ -15,16 +15,24 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./hero-list.component.scss'],
 })
 export class HeroListComponent implements OnInit {
+  @ViewChild(IonInfiniteScroll, { static: false }) infiniteScroll: IonInfiniteScroll;
+
   public heroList: Hero[] = [];
   public isOnline: boolean = false;
-  searchId: number;
   private networkStatusSubscription: Subscription;
+
+  
 
   total: number = 0;
   skip: number = 0;
   take: number = 3;
 
   public hasNewHeroes: Subscription;
+
+  public searchHero: Subscription;
+
+  enableLoad:boolean = false;
+  
 
   constructor(
     private heroProvider: HeroProvider,
@@ -52,9 +60,34 @@ export class HeroListComponent implements OnInit {
         console.log(eventError);
       }
     );
+    this.searchHero = this.eventEmitterService.currentSearchInputHero.subscribe(
+      (eventRes) => {
+        this.enableLoad = false;
+        if(String(eventRes) === ''){
+          if(this.infiniteScroll === undefined){
+            this.take = this.skip
+            this.skip = 0;
+          }
+          else if(this.infiniteScroll.disabled){
+            this.take = this.total
+            this.skip = 0;
+          }else{
+            this.take = this.skip
+            this.skip = 0;
+          }
+          this.loadHeroes()
+        }else{
+          this.searchHeroById(eventRes);
+        }
+      },
+      (eventError) => {
+        console.log(eventError);
+      }
+    );
   }
 
   loadHeroes() {
+    this.enableLoad = true;
     this.heroProvider
       .get(this.skip, this.take)
       .pipe(
@@ -134,11 +167,22 @@ export class HeroListComponent implements OnInit {
 
   }
 
-  searchHeroById(form: NgForm) {
-    if (form.valid) {
-      const heroId = this.searchId;
-      this.heroList = this.heroList.filter((hero) => hero.Id === heroId);
-    }
+  searchHeroById(id: number) {
+    this.heroProvider.getById(id).pipe(
+      catchError((apiError:any) => {
+        console.log('Ocorreu um erro: ', apiError);
+        return throwError(() => apiError);
+      })
+    ).subscribe({
+      next: (apiData:any) => {
+        this.heroList.length = 0;
+        this.heroList.push(apiData);
+      },
+      error:(apiError:any) => {
+        console.log('Unhandled Error', apiError)
+      }
+    })
+
   }
 
   loadMore(event: InfiniteScrollCustomEvent): void {

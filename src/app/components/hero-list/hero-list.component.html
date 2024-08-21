@@ -25,10 +25,13 @@
       </ion-buttons>
     </div>
   </ion-card>
-  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-    <ion-infinite-scroll-content
-      loadingText="Please wait..."
-      loadingSpinner="bubbles"
-    ></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  <div *ngIf="enableLoad">
+    <ion-infinite-scroll  #infiniteScroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingText="Please wait..."
+        loadingSpinner="bubbles"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+  
 </div>

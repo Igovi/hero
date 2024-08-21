@@ -1,0 +1,23 @@
+.searchbar__container{
+    border: 2px #220022 solid;
+    width: 240px;
+    height: 30px;
+    border-radius: 5px;
+    margin: 20px auto; /* Centraliza horizontalmente */
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo dentro do container */
+    align-items: center; /* Centraliza verticalmente */
+    .searchbar__content{
+        display: flex;
+        align-items: center;
+        .searchbar__input{
+            text-align: left; /* Alinha o texto no início (esquerda) */
+            margin-left: 10px; /* Adiciona um padding à esquerda para dar espaço ao texto */
+        }
+        .searchbar__icon{
+            text-align: right;
+            height: 25px;
+            margin-right: 10px;
+        }
+    }
+}

@@ -5,6 +5,10 @@ import { EventEmitter, Injectable, Output } from "@angular/core";
 })
 export class EventEmitterService {
 
+    @Output() currentSearchInputHero = new EventEmitter<number>();
+    @Output() currentSearchInputCategory = new EventEmitter<number>();
+
+
     @Output() hasNewHeroes = new EventEmitter<boolean>();
 
 }

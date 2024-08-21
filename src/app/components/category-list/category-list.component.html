@@ -1,7 +1,9 @@
 <div class="category__container">
   <ion-card *ngFor="let category of categoryList" class="category__card">
     <div class="category__cardLeft">
-        <ion-card-title class="category__title">{{ category.Name }}</ion-card-title>
+      <ion-card-title class="category__title">{{
+        category.Name
+      }}</ion-card-title>
     </div>
 
     <div class="category__cardRight">
@@ -11,7 +13,11 @@
           (click)="editCategory(category)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon class="category__iconEdit" slot="icon-only" name="create-outline"></ion-icon>
+          <ion-icon
+            class="category__iconEdit"
+            slot="icon-only"
+            name="create-outline"
+          ></ion-icon>
         </ion-button>
         <ion-button
           fill="clear"
@@ -19,16 +25,22 @@
           (click)="deleteCategory(category)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon class="category__iconRemove" slot="icon-only" name="trash-outline" color="danger"></ion-icon>
+          <ion-icon
+            class="category__iconRemove"
+            slot="icon-only"
+            name="trash-outline"
+            color="danger"
+          ></ion-icon>
         </ion-button>
       </ion-buttons>
     </div>
   </ion-card>
-
-  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-    <ion-infinite-scroll-content
-      loadingText="Please wait..."
-      loadingSpinner="bubbles"
-    ></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  <div *ngIf="enableLoad">
+    <ion-infinite-scroll #infiniteScroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingText="Please wait..."
+        loadingSpinner="bubbles"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
 </div>

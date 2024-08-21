@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
 import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
+import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 import { DataService } from 'src/app/services/storage/data.service';
@@ -13,6 +14,9 @@ import { DataService } from 'src/app/services/storage/data.service';
 })
 export class CategoryListComponent  implements OnInit {
 
+  @ViewChild(IonInfiniteScroll, { static: false }) infiniteScroll: IonInfiniteScroll;
+
+
   public categoryList:Category[] =[];
 
   total:number = 0;
@@ -22,14 +26,65 @@ export class CategoryListComponent  implements OnInit {
   public isOnline: boolean = false;
 
   private networkStatusSubscription: Subscription;
+
+  public hasNewCategories: Subscription;
+
+  public searchCategory:Subscription;
+
+  enableLoad:boolean = false;
   
-  constructor(private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService) {}
+  constructor(private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService) {}
 
   ngOnInit() {
+    this.initSubscriptions();
     this.networkCheck();
   }
   
+  initSubscriptions() {
+    this.hasNewCategories = this.eventEmitterService.hasNewHeroes.subscribe(
+      (eventRes) => {
+        this.skip = 0;
+        this.take = 3;
+        if (this.isOnline) {
+          this.loadCategories();
+        } else {
+          this.loadStoredCategories();
+        }
+      },
+      (eventError) => {
+        console.log(eventError);
+      }
+    );
+     this.searchCategory = this.eventEmitterService.currentSearchInputCategory.subscribe(
+      (eventRes) => {
+        this.enableLoad = false;
+        if(String(eventRes) === ''){
+          if(this.infiniteScroll === undefined){
+            this.take = this.skip
+            this.skip = 0;
+          }
+          else if(this.infiniteScroll.disabled){
+            this.take = this.total
+            this.skip = 0;
+          }else{
+            this.take = this.skip
+            this.skip = 0;
+          }
+          this.loadCategories()
+        }else{
+          this.searchCategoryById(eventRes);
+        }
+           
+        
+      },
+      (eventError) => {
+        console.log(eventError);
+      }
+    );
+  }
+
   loadCategories() {
+    this.enableLoad = true;
     this.categoryProvider.get(this.skip,this.take).pipe(
       catchError((apiError: any) => {
         console.log('Ocorreu um erro: ', apiError);
@@ -124,5 +179,23 @@ export class CategoryListComponent  implements OnInit {
 
       this.dataService.saveData('categoryList', this.categoryList);
     }
+  }
+
+  searchCategoryById(id: number) {
+    this.categoryProvider.getById(id).pipe(
+      catchError((apiError:any) => {
+        console.log('Ocorreu um erro: ', apiError);
+        return throwError(() => apiError);
+      })
+    ).subscribe({
+      next: (apiData:any) => {
+        this.categoryList.length = 0;
+        this.categoryList.push(apiData);
+      },
+      error:(apiError:any) => {
+        console.log('Unhandled Error', apiError)
+      }
+    })
+
   }
 }
