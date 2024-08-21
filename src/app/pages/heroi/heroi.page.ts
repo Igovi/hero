@@ -20,7 +20,7 @@ export class HeroiPage implements OnInit {
     
   }
   
-  async ngOnInit() {
+  ngOnInit() {
     this.networkCheck();
   }
 

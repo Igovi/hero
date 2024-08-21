@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { catchError, of } from 'rxjs';
+import { catchError, of, Subscription } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
+import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
+import { DataService } from 'src/app/services/storage/data.service';
 
 @Component({
   selector: 'app-categoria',
@@ -12,10 +14,14 @@ export class CategoriaPage  implements OnInit{
 
   public categoryList:Category[] =[];
 
-  constructor(private categoryProvider: CategoryProvider) {}
+  public isOnline: boolean = false;
+
+  private networkStatusSubscription: Subscription;
+  
+  constructor(private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService) {}
 
   ngOnInit() {
-    this.loadCategories();
+    this.networkCheck();
   }
   
   loadCategories() {
@@ -27,9 +33,31 @@ export class CategoriaPage  implements OnInit{
     ).subscribe({
       next: (apiData: any) => {
         this.categoryList = apiData.Items; 
+        this.dataService.saveData('categoryList', this.categoryList);
+
       },
       error: (apiError: any) => {
         console.log('Unhandled error:', apiError);
+      }
+    });
+  }
+
+  loadStoredCategories(){
+    this.dataService.getData('categoryList').then(storedCategoryList => {
+      if (storedCategoryList) {
+        this.categoryList = storedCategoryList;
+      }
+    });
+  }
+
+  networkCheck(){
+    this.networkStatusSubscription = this.networkService.networkStatus$.subscribe(isOnline => {
+      this.isOnline = isOnline;
+      console.log('Network status updated:', this.isOnline);
+      if (this.isOnline) {
+        this.loadCategories();
+      } else {
+        this.loadStoredCategories();
       }
     });
   }
