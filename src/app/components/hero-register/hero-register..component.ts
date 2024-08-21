@@ -11,7 +11,7 @@ import { DataService } from 'src/app/services/storage/data.service';
   templateUrl: './hero-register.component.html',
   styleUrls: ['./hero-register.component.scss'],
 })
-export class HeroRegisterComponent implements OnInit  , OnDestroy {
+export class HeroRegisterComponent implements OnInit  {
 
   public isOnline: boolean = false;
   private networkStatusSubscription: Subscription;
@@ -25,6 +25,8 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
 
   pendingHeroList: any[] = [];
 
+  heroList: any[] = [];
+
   constructor(
     private categoryProvider: CategoryProvider,
     private toastController: ToastController,
@@ -36,15 +38,14 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
 
   async ngOnInit() {
     this.pendingHeroList = await this.dataService.getData('pendingHeroList');
+    this.dataService.getData('heroList').then(storedHeroList=>{
+      this.heroList = storedHeroList;
+    })
     this.pendingHeroList === null ? this.pendingHeroList = [] : null;
     this.networkCheck();
     this.loadCategories();
   }
-  ngOnDestroy() {
-    if (this.networkStatusSubscription) {
-      this.networkStatusSubscription.unsubscribe();
-    }
-  }
+ 
 
   networkCheck(){
     this.networkStatusSubscription = this.networkService.networkStatus$.subscribe(isOnline => {
@@ -54,14 +55,16 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
       }
     });
   }
-
-
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
       private async syncStoredData() {
     const pendingData = await this.dataService.getData('pendingHeroList');
     pendingData.forEach( async (hero: any) => {
       
-      await this.sendHeroData(hero);
+      await this.sendHeroData(hero,true);
+      await this.sleep(2000);
     });
     this.dataService.removeData('pendingHeroList');
   }
@@ -107,7 +110,7 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
 
   onSubmit(form: any) {
     if (form.valid && this.isOnline) {
-      this.sendHeroData(form);
+      this.sendHeroData(form,false);
     } else {
       this.isOnline ? console.log('Formulário inválido!') : this.storeHeroData(form);
     }
@@ -120,10 +123,13 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
       Active: true,
     };
     this.pendingHeroList.push(data);
+    this.heroList.push(data);
     this.dataService.saveData('pendingHeroList', this.pendingHeroList);
+    this.dataService.saveData('heroList' , this.heroList);
   }
 
-  sendHeroData(form: any) {
+  sendHeroData(form: any,isStored: boolean) {
+    
     let data = {
       Name: this.hero.name,
       CategoryId: this.hero.category,
@@ -131,7 +137,7 @@ export class HeroRegisterComponent implements OnInit  , OnDestroy {
     };
 
     this.heroProvider
-      .post(data)
+      .post(isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
           this.presentToast('Ocorreu um erro ao enviar o herói.');

@@ -1,8 +1,13 @@
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title *ngFor="let item of heroList" size="large">{{item.Name}}</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <app-header [hasArrow]="true"></app-header>
+  <ion-toolbar>
+    <ion-title *ngFor="let item of heroList" size="large">{{item.Name}}</ion-title>
+  </ion-toolbar>
+  <div *ngIf="isOnline; else offline">
+    <p>You are online!</p>
+  </div>
+  <ng-template #offline>
+    <p>You are offline!</p>
+  </ng-template>
 </ion-content>
+

@@ -5,13 +5,15 @@ import { FormsModule } from '@angular/forms';
 
 import { HeroiPage } from './heroi.page';
 import { HeroiPageRoutingModule } from './heroi-routing.module';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    HeroiPageRoutingModule
+    HeroiPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [HeroiPage]
 })
