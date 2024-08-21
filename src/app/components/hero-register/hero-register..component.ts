@@ -64,7 +64,6 @@ export class HeroRegisterComponent implements OnInit  {
     pendingData.forEach( async (hero: any) => {
       
       await this.sendHeroData(hero,true);
-      await this.sleep(2000);
     });
     this.dataService.removeData('pendingHeroList');
   }
