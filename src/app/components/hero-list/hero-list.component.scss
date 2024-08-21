@@ -1,12 +1,29 @@
 .hero__card {
+    border-radius: 2px;
+  --background: #888888;
+  --color: #fff;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     .hero__cardLeft {
+      margin: 15px;
+      .hero__title{
+        --color: #fff;
+        font-size: 25px;
+      }
+      .hero__subtitle{
+        margin-top: 5px;
+        margin-bottom: 0px;
+      }
     }
     .hero__cardRight {
       margin: 5%;
+      .hero__iconEdit{
+        color: #202020
+      }
+      .hero__iconRemove{
+      }
     }
   }
   

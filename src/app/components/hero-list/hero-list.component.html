@@ -1,13 +1,8 @@
 <div class="hero__container">
   <ion-card *ngFor="let hero of heroList" class="hero__card">
     <div class="hero__cardLeft">
-      <ion-card-header>
-        <ion-card-title>{{ hero.Name }}</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
-        <p>{{ hero.Category.Name }}</p>
-      </ion-card-content>
+        <ion-card-title class="hero__title">{{ hero.Name }}</ion-card-title>
+        <p class="hero__subtitle">{{ hero.Category.Name }}</p>
     </div>
 
     <div class="hero__cardRight">
@@ -17,7 +12,7 @@
           (click)="editHero(hero)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          <ion-icon class="hero__iconEdit" slot="icon-only" name="create-outline"></ion-icon>
         </ion-button>
         <ion-button
           fill="clear"
@@ -25,7 +20,7 @@
           (click)="deleteHero(hero)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          <ion-icon class="hero__iconRemove" slot="icon-only" name="trash-outline" color="danger"></ion-icon>
         </ion-button>
       </ion-buttons>
     </div>

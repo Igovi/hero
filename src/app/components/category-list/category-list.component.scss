@@ -1,14 +1,29 @@
 
   .category__card {
+    border-radius: 2px;
+    --background: #888888;
+    --color: #fff;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     .category__cardLeft {
+      margin: 15px;
+      .category__title{
+        --color: #fff;
+        font-size: 20px;
+      }
     }
     .category__cardRight {
       margin: 5%;
+        .category__iconEdit{
+          color: #202020
+        }
+        .category__iconRemove{
+        }
+      
     }
+    
   }
 
 

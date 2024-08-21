@@ -1,9 +1,7 @@
 <div class="category__container">
   <ion-card *ngFor="let category of categoryList" class="category__card">
     <div class="category__cardLeft">
-      <ion-card-header>
-        <ion-card-title>{{ category.Name }}</ion-card-title>
-      </ion-card-header>
+        <ion-card-title class="category__title">{{ category.Name }}</ion-card-title>
     </div>
 
     <div class="category__cardRight">
@@ -13,7 +11,7 @@
           (click)="editCategory(category)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          <ion-icon class="category__iconEdit" slot="icon-only" name="create-outline"></ion-icon>
         </ion-button>
         <ion-button
           fill="clear"
@@ -21,7 +19,7 @@
           (click)="deleteCategory(category)"
           (click)="$event.stopPropagation()"
         >
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          <ion-icon class="category__iconRemove" slot="icon-only" name="trash-outline" color="danger"></ion-icon>
         </ion-button>
       </ion-buttons>
     </div>
