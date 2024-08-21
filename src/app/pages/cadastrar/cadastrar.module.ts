@@ -5,13 +5,15 @@ import { FormsModule } from '@angular/forms';
 
 import { CadastrarPage } from './cadastrar.page';
 import { CadastrarPageRoutingModule } from './cadastrar-routing.module';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    CadastrarPageRoutingModule
+    CadastrarPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [CadastrarPage]
 })
