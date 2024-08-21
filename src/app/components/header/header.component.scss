@@ -1,8 +1,8 @@
 .header__container {
     display: block;
     width: 100%;
-    height: 150px;
-    background-color: #141313;
+    height: 95px;
+    background-color: #202020;
     .header__content {
       display: flex;
       flex-direction: row;
@@ -14,8 +14,8 @@
   
       .header__center {
         .header__img {
-          width: 130px;
-          height: 145px;
+          width: 100px;
+          height: 100px;
         }
       }
       .header__right {
