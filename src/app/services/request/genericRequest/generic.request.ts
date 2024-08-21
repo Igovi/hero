@@ -20,8 +20,8 @@ export class GenericRequest<T>{
     }
     
 
-    get():Observable<T[]>{
-        return this.http.get<T[]>(`${apiUrl}${this.path}`,{ headers: this.headers });       
+    get(skip:number,take:number):Observable<T[]>{
+        return this.http.get<T[]>(`${apiUrl}${this.path}?skip=${skip}&take=${take}`,{ headers: this.headers });       
     }
 
     getById(genericId:number):Observable<T>{
@@ -29,7 +29,7 @@ export class GenericRequest<T>{
     }
 
     post(data:any):Observable<T>{
-        return this.http.post<T>(`${apiUrl}/${this.path}`, data, { headers: this.headers });       
+        return this.http.post<T>(`${apiUrl}${this.path}`, data, { headers: this.headers });       
     }
 
     put(genericId:number , data:any):Observable<T>{

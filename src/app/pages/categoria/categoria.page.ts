@@ -14,6 +14,10 @@ export class CategoriaPage  implements OnInit{
 
   public categoryList:Category[] =[];
 
+  totals:number = 0;
+  skip:number = 0;
+  take:number = 3;
+
   public isOnline: boolean = false;
 
   private networkStatusSubscription: Subscription;
@@ -25,7 +29,7 @@ export class CategoriaPage  implements OnInit{
   }
   
   loadCategories() {
-    this.categoryProvider.get().pipe(
+    this.categoryProvider.get(this.skip,this.take).pipe(
       catchError((apiError: any) => {
         console.log('Ocorreu um erro: ', apiError);
         return of([]);
@@ -33,6 +37,8 @@ export class CategoriaPage  implements OnInit{
     ).subscribe({
       next: (apiData: any) => {
         this.categoryList = apiData.Items; 
+        this.totals= apiData.Totals
+        this.skip = this.take
         this.dataService.saveData('categoryList', this.categoryList);
 
       },

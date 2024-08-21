@@ -76,7 +76,7 @@ export class HeroRegisterComponent implements OnInit  {
     await loading.present();
 
     this.categoryProvider
-      .get()
+      .get(0,50)
       .pipe(
         catchError((apiError: any) => {
           this.presentToast('Ocorreu um erro ao carregar as categorias.');

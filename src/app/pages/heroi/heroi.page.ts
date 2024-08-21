@@ -16,6 +16,10 @@ export class HeroiPage implements OnInit {
   public isOnline: boolean = false;
   private networkStatusSubscription: Subscription;
 
+  totals:number = 0;
+  skip:number = 0;
+  take:number = 3;
+
   constructor(private heroProvider: HeroProvider, private dataService: DataService,private networkService: NetworkService) {
     
   }
@@ -27,7 +31,7 @@ export class HeroiPage implements OnInit {
 
 
   loadHeroes() {
-    this.heroProvider.get().pipe(
+    this.heroProvider.get(this.skip,this.take).pipe(
       catchError((apiError: any) => {
         console.log('Ocorreu um erro: ', apiError);
         return of([]);
@@ -35,6 +39,8 @@ export class HeroiPage implements OnInit {
     ).subscribe({
       next: (apiData: any) => {
         this.heroList = apiData.Items; 
+        this.totals = apiData.Totals;
+        this.skip = this.take;
         this.dataService.saveData('heroList', this.heroList);
       },
       error: (apiError: any) => {
