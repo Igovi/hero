@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
-import { catchError, of } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Hero } from 'src/app/models/hero.model';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
@@ -31,7 +31,7 @@ export class HeroListComponent implements OnInit {
     private dataService: DataService,
     private networkService: NetworkService,
     private eventEmitterService: EventEmitterService
-  ) {}
+  ) { }
   ngOnInit() {
     this.initSubscriptions();
     this.networkCheck();
@@ -102,7 +102,36 @@ export class HeroListComponent implements OnInit {
   }
 
   deleteHero(hero: any) {
-    console.log('Excluir herói:', hero);
+    if (this.isOnline) {
+      this.heroProvider.delete(hero.Id).pipe(
+        catchError((apiError: any) => {
+          console.log('Ocorreu um erro: ', apiError);
+          return throwError(() => apiError);
+        }
+        )).subscribe({
+          next: (apiData: any) => {
+            const index = this.heroList.findIndex(el => el.Id === hero.Id);
+
+            if (index !== -1) {
+              this.heroList.splice(index, 1);
+            }
+
+            this.dataService.saveData('heroList', this.heroList);
+          },
+          error: (apiError: any) => {
+            console.log('Unhandled error:', apiError);
+          },
+        })
+    } else {
+      const index = this.heroList.findIndex(el => el.Id === hero.Id);
+
+      if (index !== -1) {
+        this.heroList.splice(index, 1);
+      }
+
+      this.dataService.saveData('heroList', this.heroList);
+    }
+
   }
 
   searchHeroById(form: NgForm) {

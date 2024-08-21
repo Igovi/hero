@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
-import { catchError, of, Subscription } from 'rxjs';
+import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
@@ -95,6 +95,34 @@ export class CategoryListComponent  implements OnInit {
   }
 
   deleteCategory(category: any) {
-    console.log('Excluir herói:', category);
+    if (this.isOnline) {
+      this.categoryProvider.delete(category.Id).pipe(
+        catchError((apiError: any) => {
+          console.log('Ocorreu um erro: ', apiError);
+          return throwError(() => apiError);
+        }
+        )).subscribe({
+          next: (apiData: any) => {
+            const index = this.categoryList.findIndex(el => el.Id === category.Id);
+
+            if (index !== -1) {
+              this.categoryList.splice(index, 1);
+            }
+
+            this.dataService.saveData('categoryList', this.categoryList);
+          },
+          error: (apiError: any) => {
+            console.log('Unhandled error:', apiError);
+          },
+        })
+    } else {
+      const index = this.categoryList.findIndex(el => el.Id === category.Id);
+
+      if (index !== -1) {
+        this.categoryList.splice(index, 1);
+      }
+
+      this.dataService.saveData('categoryList', this.categoryList);
+    }
   }
 }
