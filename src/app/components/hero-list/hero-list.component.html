@@ -1,0 +1,52 @@
+<ion-content>
+    <ion-list>
+      <ion-card
+        *ngFor="let hero of heroList;"
+        class="hero__card"
+      >
+        <div class="hero__cardLeft">
+          <ion-card-header>
+            <ion-card-title>{{ hero.Name }}</ion-card-title>
+          </ion-card-header>
+  
+          <ion-card-content>
+            <p>{{ hero.Category.Name }}</p>
+          </ion-card-content>
+        </div>
+  
+        <div class="hero__cardRight">
+          <ion-buttons>
+            <ion-button
+              fill="clear"
+              (click)="editHero(hero)"
+              (click)="$event.stopPropagation()"
+            >
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="deleteHero(hero)"
+              (click)="$event.stopPropagation()"
+            >
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-card>
+    </ion-list>
+  
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingText="Please wait..."
+        loadingSpinner="bubbles"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+    <div *ngIf="isOnline; else offline">
+      <p>You are online!</p>
+    </div>
+    <ng-template #offline>
+      <p>You are offline!</p>
+    </ng-template>
+  </ion-content>
+  
