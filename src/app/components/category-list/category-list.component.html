@@ -1,20 +1,16 @@
-<div class="hero__container">
-  <ion-card *ngFor="let hero of heroList" class="hero__card">
-    <div class="hero__cardLeft">
+<div class="category__container">
+  <ion-card *ngFor="let category of categoryList" class="category__card">
+    <div class="category__cardLeft">
       <ion-card-header>
-        <ion-card-title>{{ hero.Name }}</ion-card-title>
+        <ion-card-title>{{ category.Name }}</ion-card-title>
       </ion-card-header>
-
-      <ion-card-content>
-        <p>{{ hero.Category.Name }}</p>
-      </ion-card-content>
     </div>
 
-    <div class="hero__cardRight">
+    <div class="category__cardRight">
       <ion-buttons>
         <ion-button
           fill="clear"
-          (click)="editHero(hero)"
+          (click)="editCategory(category)"
           (click)="$event.stopPropagation()"
         >
           <ion-icon slot="icon-only" name="create-outline"></ion-icon>
@@ -22,7 +18,7 @@
         <ion-button
           fill="clear"
           color="danger"
-          (click)="deleteHero(hero)"
+          (click)="deleteCategory(category)"
           (click)="$event.stopPropagation()"
         >
           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
@@ -30,6 +26,7 @@
       </ion-buttons>
     </div>
   </ion-card>
+
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content
       loadingText="Please wait..."
