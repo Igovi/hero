@@ -18,8 +18,6 @@ export class SearchBarComponent {
 
   onInput(event:any) {
     this.inputValue = event.target.value;
-    console.log(this.inputValue)
-    console.log(this.heroPage)
     this.heroPage ?  this.eventEmitterService.currentSearchInputHero.emit(this.inputValue): this.eventEmitterService.currentSearchInputCategory.emit(this.inputValue);
 }
 }

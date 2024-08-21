@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { catchError, of, Subscription } from 'rxjs';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 import { ToastController, LoadingController } from '@ionic/angular';
@@ -12,20 +12,18 @@ import { EventEmitterService } from 'src/app/services/communication/event-emmite
   templateUrl: './hero-register.component.html',
   styleUrls: ['./hero-register.component.scss'],
 })
-export class HeroRegisterComponent implements OnInit  {
-
+export class HeroRegisterComponent implements OnInit, OnDestroy {
   public isOnline: boolean = false;
   private networkStatusSubscription: Subscription;
-  
+
   hero = {
     name: '',
     category: '',
+    active: true, // Default value as true for "Vivo"
   };
 
   categories: any[] = [];
-
   pendingHeroList: any[] = [];
-
   heroList: any[] = [];
 
   constructor(
@@ -35,37 +33,33 @@ export class HeroRegisterComponent implements OnInit  {
     private heroProvider: HeroProvider,
     private networkService: NetworkService,
     private dataService: DataService,
-    private eventEmitterService:EventEmitterService
+    private eventEmitterService: EventEmitterService
   ) {}
 
   async ngOnInit() {
     this.pendingHeroList = await this.dataService.getData('pendingHeroList');
-    this.dataService.getData('heroList').then(storedHeroList=>{
+    this.dataService.getData('heroList').then((storedHeroList) => {
       this.heroList = storedHeroList;
-    })
-    this.pendingHeroList === null ? this.pendingHeroList = [] : null;
+    });
+    this.pendingHeroList === null ? (this.pendingHeroList = []) : null;
     this.networkCheck();
     this.loadCategories();
   }
- 
 
-  networkCheck(){
-    this.networkStatusSubscription = this.networkService.networkStatus$.subscribe(isOnline => {
-      this.isOnline = isOnline;
-      if(this.isOnline && this.pendingHeroList.length !== 0){
-        this.syncStoredData();
-      }
-    });
-  }
-  private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  networkCheck() {
+    this.networkStatusSubscription =
+      this.networkService.networkStatus$.subscribe((isOnline) => {
+        this.isOnline = isOnline;
+        if (this.isOnline && this.pendingHeroList.length !== 0) {
+          this.syncStoredData();
+        }
+      });
   }
 
-      private async syncStoredData() {
+  private async syncStoredData() {
     const pendingData = await this.dataService.getData('pendingHeroList');
-    pendingData.forEach( async (hero: any) => {
-      
-      await this.sendHeroData(hero,true);
+    pendingData.forEach(async (hero: any) => {
+      await this.sendHeroData(hero, true);
       this.eventEmitterService.hasNewHeroes.emit(true);
     });
     this.dataService.removeData('pendingHeroList');
@@ -79,7 +73,7 @@ export class HeroRegisterComponent implements OnInit  {
     await loading.present();
 
     this.categoryProvider
-      .get(0,50)
+      .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
           this.presentToast('Ocorreu um erro ao carregar as categorias.');
@@ -112,32 +106,33 @@ export class HeroRegisterComponent implements OnInit  {
 
   onSubmit(form: any) {
     if (form.valid && this.isOnline) {
-      this.sendHeroData(form,false);
+      this.sendHeroData(form, false);
       this.eventEmitterService.hasNewHeroes.emit(true);
     } else {
-      this.isOnline ? console.log('Formulário inválido!') : this.storeHeroData(form);
+      this.isOnline
+        ? console.log('Formulário inválido!')
+        : this.storeHeroData(form);
     }
   }
 
-  async storeHeroData(form:any){
+  async storeHeroData(form: any) {
     let data = {
       Name: this.hero.name,
       CategoryId: this.hero.category,
-      Active: true,
+      Active: this.hero.active,
     };
     this.pendingHeroList.push(data);
     this.heroList.push(data);
     this.dataService.saveData('pendingHeroList', this.pendingHeroList);
-    await this.dataService.saveData('heroList' , this.heroList);
+    await this.dataService.saveData('heroList', this.heroList);
     this.eventEmitterService.hasNewHeroes.emit(true);
   }
 
-  sendHeroData(form: any,isStored: boolean) {
-    
+  sendHeroData(form: any, isStored: boolean) {
     let data = {
       Name: this.hero.name,
       CategoryId: this.hero.category,
-      Active: true,
+      Active: this.hero.active,
     };
 
     this.heroProvider
@@ -152,12 +147,19 @@ export class HeroRegisterComponent implements OnInit  {
       .subscribe({
         next: async (apiData: any) => {
           this.presentToast('Herói enviado com sucesso.');
-          form.reset(); // Limpa o formulário após o envio com sucesso
+          form.reset();
+          this.hero.active = true;
         },
         error: (apiError: any) => {
           this.presentToast('Ocorreu um erro inesperado.');
           console.log('Unhandled error:', apiError);
         },
       });
+  }
+
+  ngOnDestroy() {
+    if (this.networkStatusSubscription) {
+      this.networkStatusSubscription.unsubscribe();
+    }
   }
 }

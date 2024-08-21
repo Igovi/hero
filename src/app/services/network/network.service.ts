@@ -19,14 +19,12 @@ export class NetworkService {
     this.networkStatusSubject.next(status.connected);
 
     Network.addListener('networkStatusChange', (status: ConnectionStatus) => {
-      console.log('Network status changed:', status);
       this.networkStatusSubject.next(status.connected);
     });
   }
 
   async getNetworkStatus(): Promise<boolean> {
     const status = await Network.getStatus();
-    console.log('Current network status:', status);
     return status.connected;
   }
 }

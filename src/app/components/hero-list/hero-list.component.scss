@@ -16,6 +16,24 @@
         margin-top: 5px;
         margin-bottom: 0px;
       }
+      .hero_statusContainer{
+        display: flex;
+        align-items: center;
+        .hero__statusLife{
+          color: green;
+        }
+        .hero__statusDeath{
+          color: red;
+        }
+        .hero__iconLife{
+          margin-right: 10px;
+          color: green;
+        }
+        .hero__iconDeath{
+          margin-right: 10px;
+          color: red;
+        }
+      }
     }
     .hero__cardRight {
       margin: 5%;

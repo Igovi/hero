@@ -17,8 +17,18 @@
 
   .register__inputCategory {
     width: 70%;
+    margin-bottom: 20px;
     .register__inputCategoryContainer {
       border-radius: 10px;
+    }
+  }
+  .register__inputStatus {
+    width: 70%;
+    .register__inputStatusFirst {
+      --border-radius: 10px 10px 0px 0px;
+    }
+    .register__inputStatusLast {
+      --border-radius: 0px 0px 10px 10px;
     }
   }
 
@@ -27,7 +37,7 @@
     .register__button {
       --background: #09a722;
       --background-activated: #077c19;
-      --border-radius:5px;
+      --border-radius: 5px;
       width: 100px;
       height: 40px;
     }

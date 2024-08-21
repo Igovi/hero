@@ -2,6 +2,7 @@
   <form #heroForm="ngForm" (ngSubmit)="onSubmit(heroForm)">
     <div class="register__container">
       <div class="register__title">Cadastro de Heróis</div>
+
       <div class="register__inputName">
         <ion-item class="register__inputNameCotainer">
           <ion-input
@@ -47,6 +48,30 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
+      </div>
+
+      <div class="register__inputStatus">
+        <ion-item class="register__inputStatusFirst">
+          <ion-label>Status</ion-label>
+        </ion-item>
+        <ion-radio-group [(ngModel)]="hero.active" name="active">
+          <ion-item lines="none">
+            <ion-label>Vivo</ion-label>
+            <ion-radio
+              slot="start"
+              [value]="true"
+              aria-label="Status Vivo"
+            ></ion-radio>
+          </ion-item>
+          <ion-item lines="none" class="register__inputStatusLast">
+            <ion-label>Morto</ion-label>
+            <ion-radio
+              slot="start"
+              [value]="false"
+              aria-label="Status Morto"
+            ></ion-radio>
+          </ion-item>
+        </ion-radio-group>
       </div>
 
       <div class="register__submitButton">

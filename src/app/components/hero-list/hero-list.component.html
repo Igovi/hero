@@ -3,6 +3,17 @@
     <div class="hero__cardLeft">
         <ion-card-title class="hero__title">{{ hero.Name }}</ion-card-title>
         <p class="hero__subtitle">{{ hero.Category.Name }}</p>
+        <div class="hero_statusContainer">
+          <ion-icon 
+            [ngClass]="{ 'hero__iconLife': hero.Active, 'hero__iconDeath': !hero.Active }" 
+            [name]="hero.Active ? 'heart-outline' : 'skull-outline'">
+          </ion-icon>
+          <p [ngClass]="{ 'hero__statusLife': hero.Active, 'hero__statusDeath': !hero.Active }">
+            {{ hero.Active ? 'Vivo' : 'Morto' }}
+          </p>
+          
+        </div>
+        
     </div>
 
     <div class="hero__cardRight">
