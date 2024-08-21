@@ -2,6 +2,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { EditPage } from '../pages/edit/edit.page';
 
 const routes: Routes = [
   {
@@ -11,6 +12,10 @@ const routes: Routes = [
       {
         path: 'heroi',
         loadChildren: () => import('../pages/heroi/heroi.module').then(m => m.HeroiPageModule)
+      },
+      {
+        path: 'heroi/:id',
+        loadChildren: () => import('../pages/edit/edit.module').then(m => m.EditPageModule)
       },
       {
         path: 'categoria',
@@ -31,7 +36,8 @@ const routes: Routes = [
     path: '',
     redirectTo: '/heroi',
     pathMatch: 'full'
-  }
+  },
+  
 ];
 
 @NgModule({

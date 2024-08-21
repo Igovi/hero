@@ -8,6 +8,7 @@ import { NetworkService } from 'src/app/services/network/network.service';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { DataService } from 'src/app/services/storage/data.service';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-hero-list',
@@ -38,7 +39,8 @@ export class HeroListComponent implements OnInit {
     private heroProvider: HeroProvider,
     private dataService: DataService,
     private networkService: NetworkService,
-    private eventEmitterService: EventEmitterService
+    private eventEmitterService: EventEmitterService,
+    private router: Router
   ) { }
   ngOnInit() {
     this.initSubscriptions();
@@ -48,8 +50,15 @@ export class HeroListComponent implements OnInit {
   initSubscriptions() {
     this.hasNewHeroes = this.eventEmitterService.hasNewHeroes.subscribe(
       (eventRes) => {
-        this.skip = 0;
-        this.take = 3;
+        
+        if(this.infiniteScroll.disabled){
+          this.total += 1;
+          this.take = this.total
+          this.skip = 0;
+        }else{
+          this.take = this.skip
+          this.skip = 0;
+        }
         if (this.isOnline) {
           this.loadHeroes();
         } else {
@@ -132,6 +141,7 @@ export class HeroListComponent implements OnInit {
 
   editHero(hero: any) {
     console.log('Editar herói:', hero);
+    this.router.navigate([`heroi/${hero.Id}`]);
   }
 
   deleteHero(hero: any) {

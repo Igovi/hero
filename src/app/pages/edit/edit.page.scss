@@ -1,0 +1,47 @@
+.edit__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .edit__title {
+      margin-top: 25px;
+      margin-bottom: 25px;
+      font-size: 35px;
+    }
+  
+    .edit__inputName {
+      width: 70%;
+      margin-bottom: 20px;
+      .edit__inputNameCotainer {
+        border-radius: 10px;
+      }
+    }
+  
+    .edit__inputCategory {
+      width: 70%;
+      margin-bottom: 20px;
+      .edit__inputCategoryContainer {
+        border-radius: 10px;
+      }
+    }
+    .edit__inputStatus {
+      width: 70%;
+      .edit__inputStatusFirst {
+        --border-radius: 10px 10px 0px 0px;
+      }
+      .edit__inputStatusLast {
+        --border-radius: 0px 0px 10px 10px;
+      }
+    }
+  
+    .edit__submitButton {
+      margin: 30px;
+      .edit__button {
+        --background: #09a722;
+        --background-activated: #077c19;
+        --border-radius: 5px;
+        width: 100px;
+        height: 40px;
+      }
+    }
+  }
+  

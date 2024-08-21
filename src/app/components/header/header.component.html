@@ -2,8 +2,8 @@
   <div class="header__container">
     <div class="header__content">
       <div class="header__left">
-        <ion-button *ngIf="hasArrow" (click)="goBack()" fill="clear">
-          <ion-icon name="arrow-back"></ion-icon>
+        <ion-button  class="header__arrowButton" *ngIf="hasArrow" (click)="goBack()" fill="clear">
+          <ion-icon class="header__arrow" name="arrow-back"></ion-icon>
         </ion-button>
       </div>
       <div class="header__center">

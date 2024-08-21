@@ -1,0 +1,93 @@
+<ion-content [fullscreen]="true">
+    <app-header [hasArrow]="true"></app-header>
+    <ion-content>
+        <form #heroForm="ngForm" (ngSubmit)="onSubmit(heroForm)">
+          <div class="edit__container">
+            <div class="edit__title">Edição de Herói</div>
+      
+            <div class="edit__inputName">
+              <ion-item class="edit__inputNameCotainer">
+                <ion-input
+                  class="edit_input"
+                  type="text"
+                  name="heroName"
+                  fill="outline"
+                  placeholder="Nome"
+                  label="Nome"
+                  label-placement="floating"
+                  [(ngModel)]="hero.Name"
+                  required
+                  minlength="3"
+                  #heroName="ngModel"
+                ></ion-input>
+              </ion-item>
+              <div
+                *ngIf="heroName.invalid && (heroName.dirty || heroName.touched)"
+                class="error"
+              >
+                <div *ngIf="heroName.errors?.['required']">Nome é obrigatório.</div>
+                <div *ngIf="heroName.errors?.['minlength']">
+                  Nome deve ter pelo menos 3 caracteres.
+                </div>
+              </div>
+            </div>
+      
+            <div class="edit__inputCategory">
+              <ion-item class="edit__inputCategoryContainer">
+                <ion-label>Categoria</ion-label>
+                <ion-select
+                  name="category"
+                  [(ngModel)]="hero.Category.Id"
+                  required
+                  class="edit__inputCategorySelect"
+                  justify="end"
+                >
+                  <ion-select-option
+                    *ngFor="let category of categoryList"
+                    [value]="category.Id"
+                  >
+                    {{ category.Name }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+      
+            <div class="edit__inputStatus">
+              <ion-item class="edit__inputStatusFirst">
+                <ion-label>Status</ion-label>
+              </ion-item>
+              <ion-radio-group [(ngModel)]="hero.Active" name="active">
+                <ion-item lines="none">
+                  <ion-label>Vivo</ion-label>
+                  <ion-radio
+                    slot="start"
+                    [value]="true"
+                    aria-label="Status Vivo"
+                  ></ion-radio>
+                </ion-item>
+                <ion-item lines="none" class="edit__inputStatusLast">
+                  <ion-label>Morto</ion-label>
+                  <ion-radio
+                    slot="start"
+                    [value]="false"
+                    aria-label="Status Morto"
+                  ></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </div>
+      
+            <div class="edit__submitButton">
+              <ion-button
+                type="submit"
+                [disabled]="heroForm.invalid"
+                class="edit__button"
+              >
+                Editar
+              </ion-button>
+            </div>
+          </div>
+        </form>
+      </ion-content>
+      
+</ion-content>>
+  
