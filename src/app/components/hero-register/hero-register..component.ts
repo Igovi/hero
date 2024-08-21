@@ -5,6 +5,7 @@ import { ToastController, LoadingController } from '@ionic/angular';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { DataService } from 'src/app/services/storage/data.service';
+import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
 
 @Component({
   selector: 'app-hero-register',
@@ -33,7 +34,8 @@ export class HeroRegisterComponent implements OnInit  {
     private loadingController: LoadingController,
     private heroProvider: HeroProvider,
     private networkService: NetworkService,
-    private dataService: DataService
+    private dataService: DataService,
+    private eventEmitterService:EventEmitterService
   ) {}
 
   async ngOnInit() {
@@ -64,6 +66,7 @@ export class HeroRegisterComponent implements OnInit  {
     pendingData.forEach( async (hero: any) => {
       
       await this.sendHeroData(hero,true);
+      this.eventEmitterService.hasNewHeroes.emit(true);
     });
     this.dataService.removeData('pendingHeroList');
   }
@@ -110,12 +113,13 @@ export class HeroRegisterComponent implements OnInit  {
   onSubmit(form: any) {
     if (form.valid && this.isOnline) {
       this.sendHeroData(form,false);
+      this.eventEmitterService.hasNewHeroes.emit(true);
     } else {
       this.isOnline ? console.log('Formulário inválido!') : this.storeHeroData(form);
     }
   }
 
-  storeHeroData(form:any){
+  async storeHeroData(form:any){
     let data = {
       Name: this.hero.name,
       CategoryId: this.hero.category,
@@ -124,7 +128,8 @@ export class HeroRegisterComponent implements OnInit  {
     this.pendingHeroList.push(data);
     this.heroList.push(data);
     this.dataService.saveData('pendingHeroList', this.pendingHeroList);
-    this.dataService.saveData('heroList' , this.heroList);
+    await this.dataService.saveData('heroList' , this.heroList);
+    this.eventEmitterService.hasNewHeroes.emit(true);
   }
 
   sendHeroData(form: any,isStored: boolean) {

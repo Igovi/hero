@@ -4,6 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { catchError, of, Subscription } from 'rxjs';
 import { DataService } from 'src/app/services/storage/data.service';
 import { NetworkService } from 'src/app/services/network/network.service';
+import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
 
 @Component({
   selector: 'app-heroi',
@@ -20,15 +21,35 @@ export class HeroiPage implements OnInit {
   skip:number = 0;
   take:number = 3;
 
-  constructor(private heroProvider: HeroProvider, private dataService: DataService,private networkService: NetworkService) {
+  public hasNewHeroes: Subscription;
+
+
+  constructor(private heroProvider: HeroProvider, private dataService: DataService,private networkService: NetworkService,private eventEmitterService:EventEmitterService) {
     
   }
   
   ngOnInit() {
+    this.initSubscriptions();
     this.networkCheck();
+  
   }
 
-
+  initSubscriptions(){
+    this.hasNewHeroes = this.eventEmitterService.hasNewHeroes.subscribe(
+      eventRes => {
+        this.skip = 0;
+        this.take = 3;
+        if (this.isOnline) {
+          this.loadHeroes();
+        } else {
+          this.loadStoredHeroes();
+        }
+      },
+      eventError =>{
+          console.log(eventError)
+      }
+  )
+  }
 
   loadHeroes() {
     this.heroProvider.get(this.skip,this.take).pipe(
