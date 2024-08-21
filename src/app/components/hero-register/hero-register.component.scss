@@ -1,22 +1,35 @@
 .register__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .register__title {
-      margin: 10px;
-      font-size: 35px;
-    }
-  
-    .register__inputName {
-      width: 70%;
-    }
-  
-    .register__inputCategory {
-      width: 70%;
-    }
-  
-    .register__submitButton {
-      margin: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .register__title {
+    margin: 10px;
+    font-size: 35px;
+  }
+
+  .register__inputName {
+    width: 70%;
+    margin-bottom: 20px;
+    .register__inputNameCotainer {
+      border-radius: 10px;
     }
   }
-  
+
+  .register__inputCategory {
+    width: 70%;
+    .register__inputCategoryContainer {
+      border-radius: 10px;
+    }
+  }
+
+  .register__submitButton {
+    margin: 30px;
+    .register__button {
+      --background: #09a722;
+      --background-activated: #077c19;
+      --border-radius:5px;
+      width: 100px;
+      height: 40px;
+    }
+  }
+}

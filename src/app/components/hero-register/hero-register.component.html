@@ -3,11 +3,15 @@
     <div class="register__container">
       <div class="register__title">Cadastro de Heróis</div>
       <div class="register__inputName">
-        <ion-item>
-          <ion-label position="floating">Nome</ion-label>
+        <ion-item class="register__inputNameCotainer">
           <ion-input
+            class="register_input"
             type="text"
             name="heroName"
+            fill="outline"
+            placeholder="Nome"
+            label="Nome"
+            label-placement="floating"
             [(ngModel)]="hero.name"
             required
             minlength="3"
@@ -26,9 +30,15 @@
       </div>
 
       <div class="register__inputCategory">
-        <ion-item>
+        <ion-item class="register__inputCategoryContainer">
           <ion-label>Categoria</ion-label>
-          <ion-select name="category" [(ngModel)]="hero.category" required>
+          <ion-select
+            name="category"
+            [(ngModel)]="hero.category"
+            required
+            class="register__inputCategorySelect"
+            justify="end"
+          >
             <ion-select-option
               *ngFor="let category of categories"
               [value]="category.Id"
@@ -40,8 +50,12 @@
       </div>
 
       <div class="register__submitButton">
-        <ion-button expand="full" type="submit" [disabled]="heroForm.invalid">
-          Cadastrar Herói
+        <ion-button
+          type="submit"
+          [disabled]="heroForm.invalid"
+          class="register__button"
+        >
+          Cadastrar
         </ion-button>
       </div>
     </div>
