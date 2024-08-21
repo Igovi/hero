@@ -2,11 +2,11 @@
   <app-header [hasArrow]="false"></app-header>
   <ion-content>
     <ion-list>
-      <ion-item *ngFor="let item of heroList; let index">
+      <ion-item *ngFor="let hero of heroList; let index">
         <ion-avatar slot="start">
           <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
         </ion-avatar>
-        <ion-label>{{ item.Name }}</ion-label>
+        <ion-label>{{ hero.Name }}</ion-label>
       </ion-item>
     </ion-list>
     <ion-infinite-scroll (ionInfinite)="loadMore($event)">

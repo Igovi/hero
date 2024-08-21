@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { catchError, of, Subscription } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { NetworkService } from 'src/app/services/network/network.service';
@@ -64,6 +65,28 @@ export class CategoriaPage  implements OnInit{
         this.loadCategories();
       } else {
         this.loadStoredCategories();
+      }
+    });
+  }
+
+  loadMore(event: InfiniteScrollCustomEvent): void {
+    this.categoryProvider.get(this.skip, this.take).pipe(
+      catchError((apiError: any) => {
+        console.log('Ocorreu um erro: ', apiError);
+        return of([]);
+      })
+    ).subscribe({
+      next: (apiData: any) => {
+        this.categoryList = [...this.categoryList, ...apiData.Items];
+        this.skip += this.take;
+        this.dataService.saveData('categoryList', this.categoryList);
+        if (this.categoryList.length === this.total) {
+          event.target.disabled = true;
+        }
+        event.target.complete();
+      },
+      error: (apiError: any) => {
+        console.log('Unhandled error:', apiError);
       }
     });
   }
