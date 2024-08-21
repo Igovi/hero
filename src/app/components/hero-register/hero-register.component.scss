@@ -1,0 +1,22 @@
+.register__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .register__title {
+      margin: 10px;
+      font-size: 35px;
+    }
+  
+    .register__inputName {
+      width: 70%;
+    }
+  
+    .register__inputCategory {
+      width: 70%;
+    }
+  
+    .register__submitButton {
+      margin: 30px;
+    }
+  }
+  

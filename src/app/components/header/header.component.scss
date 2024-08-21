@@ -1,0 +1,27 @@
+.header__container {
+    display: block;
+    width: 100%;
+    height: 150px;
+    background-color: #141313;
+    .header__content {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .header__left {
+        width: 20px;
+        height: 20px;
+      }
+  
+      .header__center {
+        .header__img {
+          width: 130px;
+          height: 145px;
+        }
+      }
+      .header__right {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  

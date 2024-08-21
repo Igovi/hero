@@ -1,0 +1,49 @@
+<ion-content>
+  <form #heroForm="ngForm" (ngSubmit)="onSubmit(heroForm)">
+    <div class="register__container">
+      <div class="register__title">Cadastro de Heróis</div>
+      <div class="register__inputName">
+        <ion-item>
+          <ion-label position="floating">Nome</ion-label>
+          <ion-input
+            type="text"
+            name="heroName"
+            [(ngModel)]="hero.name"
+            required
+            minlength="3"
+            #heroName="ngModel"
+          ></ion-input>
+        </ion-item>
+        <div
+          *ngIf="heroName.invalid && (heroName.dirty || heroName.touched)"
+          class="error"
+        >
+          <div *ngIf="heroName.errors?.['required']">Nome é obrigatório.</div>
+          <div *ngIf="heroName.errors?.['minlength']">
+            Nome deve ter pelo menos 3 caracteres.
+          </div>
+        </div>
+      </div>
+
+      <div class="register__inputCategory">
+        <ion-item>
+          <ion-label>Categoria</ion-label>
+          <ion-select name="category" [(ngModel)]="hero.category" required>
+            <ion-select-option
+              *ngFor="let category of categories"
+              [value]="category.Id"
+            >
+              {{ category.Name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="register__submitButton">
+        <ion-button expand="full" type="submit" [disabled]="heroForm.invalid">
+          Cadastrar Herói
+        </ion-button>
+      </div>
+    </div>
+  </form>
+</ion-content>
