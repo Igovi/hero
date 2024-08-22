@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { catchError, of, Subscription } from 'rxjs';
+import { catchError, of, Subscription, throwError } from 'rxjs';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 import { ToastController, LoadingController, ModalController } from '@ionic/angular';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { DataService } from 'src/app/services/storage/data.service';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
+import { ToastService } from 'src/app/services/communication/toast.service';
 
 @Component({
   selector: 'app-hero-register',
@@ -34,7 +35,8 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     private networkService: NetworkService,
     private dataService: DataService,
     private eventEmitterService: EventEmitterService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private toastService:ToastService
   ) {}
 
   async ngOnInit() {
@@ -81,10 +83,9 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
-          this.presentToast('Ocorreu um erro ao carregar as categorias.');
-          console.log('Ocorreu um erro: ', apiError);
+          this.toastService.presentToast('Ocorreu um erro ao carregar as categorias.','danger');
           loading.dismiss();
-          return of([]);
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -93,21 +94,13 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
           loading.dismiss();
         },
         error: (apiError: any) => {
-          this.presentToast('Ocorreu um erro inesperado.');
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
           loading.dismiss();
         },
       });
   }
 
-  async presentToast(message: string) {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 2000,
-      position: 'bottom',
-    });
-    toast.present();
-  }
+  
 
   onSubmit(form: any) {
     if (form.valid && this.isOnline) {
@@ -144,19 +137,19 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       .post(isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
-          this.presentToast('Ocorreu um erro ao enviar o herói.');
+          this.toastService.presentToast('Ocorreu um erro ao enviar o herói','danger')
           console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          return throwError(() => apiError);
         })
       )
       .subscribe({
         next: async (apiData: any) => {
-          this.presentToast('Herói enviado com sucesso.');
+          this.toastService.presentToast('Herói enviado com sucesso.','success');
           form.reset();
+          this.modalController.dismiss();
         },
         error: (apiError: any) => {
-          this.presentToast('Ocorreu um erro inesperado.');
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }

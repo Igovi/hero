@@ -4,6 +4,7 @@ import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { Hero } from 'src/app/models/hero.model';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
+import { ToastService } from 'src/app/services/communication/toast.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 
@@ -53,7 +54,7 @@ export class EditPage implements OnInit {
 
 
 
-  constructor(private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService) { }
+  constructor(private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService,private toastService:ToastService) { }
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -70,7 +71,8 @@ export class EditPage implements OnInit {
   searchHeroById(id: number) {
     this.heroProvider.getById(id).pipe(
       catchError((apiError: any) => {
-        console.log('Ocorreu um erro: ', apiError);
+        this.toastService.presentToast('Erro ao buscar heroi','danger');
+        
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -78,7 +80,7 @@ export class EditPage implements OnInit {
         this.hero = apiData;
       },
       error: (apiError: any) => {
-        console.log('Unhandled Error', apiError)
+        console.log('Error', apiError)
       }
     })
 
@@ -87,7 +89,7 @@ export class EditPage implements OnInit {
   searchCategoryById(id: number) {
     this.categoryProvider.getById(id).pipe(
       catchError((apiError: any) => {
-        console.log('Ocorreu um erro: ', apiError);
+        this.toastService.presentToast('Erro ao buscar categoria','danger');
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -95,7 +97,7 @@ export class EditPage implements OnInit {
         this.category = apiData;
       },
       error: (apiError: any) => {
-        console.log('Unhandled Error', apiError)
+        console.log('Error', apiError)
       }
     })
 
@@ -106,8 +108,8 @@ export class EditPage implements OnInit {
       .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Erro ao buscar a lista de categorias','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -115,7 +117,7 @@ export class EditPage implements OnInit {
           this.categoryList = apiData.Items;
         },
         error: (apiError: any) => {
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }
@@ -141,9 +143,8 @@ export class EditPage implements OnInit {
       .put(this.hero.Id, isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
-
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Erro ao editar heroi','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -151,11 +152,11 @@ export class EditPage implements OnInit {
 
           form.reset();
           this.eventEmitterService.hasNewHeroes.emit(true);
+          this.toastService.presentToast('Heroi editado com sucesso','success');
           this.router.navigate([`heroi`]);
         },
         error: (apiError: any) => {
-
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }
@@ -181,9 +182,8 @@ export class EditPage implements OnInit {
       .put(this.category.Id, isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
-
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Erro ao editar categoria','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -191,11 +191,12 @@ export class EditPage implements OnInit {
 
           form.reset();
           this.eventEmitterService.hasNewCategories.emit(true);
+          this.toastService.presentToast('Categoria editada com sucesso','success');
           this.router.navigate([`categoria`]);
         },
         error: (apiError: any) => {
 
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }

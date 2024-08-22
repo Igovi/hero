@@ -9,6 +9,7 @@ import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { DataService } from 'src/app/services/storage/data.service';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastService } from 'src/app/services/communication/toast.service';
 
 @Component({
   selector: 'app-hero-list',
@@ -40,7 +41,8 @@ export class HeroListComponent implements OnInit {
     private dataService: DataService,
     private networkService: NetworkService,
     private eventEmitterService: EventEmitterService,
-    private router: Router
+    private router: Router,
+    private toastService:ToastService
   ) { }
   ngOnInit() {
     this.initSubscriptions();
@@ -101,8 +103,8 @@ export class HeroListComponent implements OnInit {
       .get(this.skip, this.take)
       .pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Ocorreu um erro ao carregar os Herois.','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -113,7 +115,7 @@ export class HeroListComponent implements OnInit {
           this.dataService.saveData('heroList', this.heroList);
         },
         error: (apiError: any) => {
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }
@@ -148,7 +150,7 @@ export class HeroListComponent implements OnInit {
     if (this.isOnline) {
       this.heroProvider.delete(hero.Id).pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
+          this.toastService.presentToast('Ocorreu um erro ao Deletar o Herois.','danger');
           return throwError(() => apiError);
         }
         )).subscribe({
@@ -160,9 +162,10 @@ export class HeroListComponent implements OnInit {
             }
 
             this.dataService.saveData('heroList', this.heroList);
+            this.toastService.presentToast('Herói deletado com sucesso','success');
           },
           error: (apiError: any) => {
-            console.log('Unhandled error:', apiError);
+            console.log('Error:', apiError);
           },
         })
     } else {
@@ -180,7 +183,7 @@ export class HeroListComponent implements OnInit {
   searchHeroById(id: number) {
     this.heroProvider.getById(id).pipe(
       catchError((apiError:any) => {
-        console.log('Ocorreu um erro: ', apiError);
+        this.toastService.presentToast('Erro ao buscar herói','danger');
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -189,7 +192,7 @@ export class HeroListComponent implements OnInit {
         this.heroList.push(apiData);
       },
       error:(apiError:any) => {
-        console.log('Unhandled Error', apiError)
+        console.log('Error', apiError)
       }
     })
 
@@ -200,8 +203,8 @@ export class HeroListComponent implements OnInit {
       .get(this.skip, this.take)
       .pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Erro ao buscar mais heróis','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
@@ -215,7 +218,8 @@ export class HeroListComponent implements OnInit {
           event.target.complete();
         },
         error: (apiError: any) => {
-          console.log('Unhandled error:', apiError);
+          
+          console.log('Error:', apiError);
         },
       });
   }

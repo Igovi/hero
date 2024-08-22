@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { catchError, of } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
+import { ToastService } from 'src/app/services/communication/toast.service';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 
@@ -21,7 +22,8 @@ export class CategoryRegisterComponent   {
   constructor(private eventEmitterService: EventEmitterService,
     private modalController: ModalController,
     private categoryProvider: CategoryProvider,
-    private networkService: NetworkService,) { }
+    private networkService: NetworkService,
+    private toastService:ToastService) { }
 
   
 
@@ -47,17 +49,19 @@ export class CategoryRegisterComponent   {
       .post(isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
-          return of([]);
+          this.toastService.presentToast('Erro ao cadastrar categoria','danger');
+          return throwError(() => apiError);
         })
       )
       .subscribe({
         next: async (apiData: any) => {
           form.reset();
           this.eventEmitterService.hasNewCategories.emit(true);
+          this.toastService.presentToast('Sucesso ao cadastrar categoria','success');
+          this.modalController.dismiss();
         },
         error: (apiError: any) => {
-          console.log('Unhandled error:', apiError);
+          console.log('Error:', apiError);
         },
       });
   }

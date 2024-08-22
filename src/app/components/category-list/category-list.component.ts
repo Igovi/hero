@@ -4,6 +4,7 @@ import { InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
 import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
+import { ToastService } from 'src/app/services/communication/toast.service';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
 import { DataService } from 'src/app/services/storage/data.service';
@@ -34,7 +35,7 @@ export class CategoryListComponent  implements OnInit {
 
   enableLoad:boolean = false;
   
-  constructor(private router: Router,private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService) {}
+  constructor(private router: Router,private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService,private toastService:ToastService) {}
 
   ngOnInit() {
     this.initSubscriptions();
@@ -94,8 +95,8 @@ export class CategoryListComponent  implements OnInit {
     this.enableLoad = true;
     this.categoryProvider.get(this.skip,this.take).pipe(
       catchError((apiError: any) => {
-        console.log('Ocorreu um erro: ', apiError);
-        return of([]);
+        this.toastService.presentToast('Erro ao carregar lista de categorias','danger');
+        return throwError(() => apiError);
       })
     ).subscribe({
       next: (apiData: any) => {
@@ -134,8 +135,8 @@ export class CategoryListComponent  implements OnInit {
   loadMore(event: InfiniteScrollCustomEvent): void {
     this.categoryProvider.get(this.skip, this.take).pipe(
       catchError((apiError: any) => {
-        console.log('Ocorreu um erro: ', apiError);
-        return of([]);
+        this.toastService.presentToast('Erro ao carregar mais categoria','danger');
+        return throwError(() => apiError);
       })
     ).subscribe({
       next: (apiData: any) => {
@@ -148,7 +149,7 @@ export class CategoryListComponent  implements OnInit {
         event.target.complete();
       },
       error: (apiError: any) => {
-        console.log('Unhandled error:', apiError);
+        console.log('Error:', apiError);
       }
     });
   }
@@ -161,7 +162,7 @@ export class CategoryListComponent  implements OnInit {
     if (this.isOnline) {
       this.categoryProvider.delete(category.Id).pipe(
         catchError((apiError: any) => {
-          console.log('Ocorreu um erro: ', apiError);
+          this.toastService.presentToast('Erro ao deletar categoria','danger');
           return throwError(() => apiError);
         }
         )).subscribe({
@@ -173,9 +174,10 @@ export class CategoryListComponent  implements OnInit {
             }
 
             this.dataService.saveData('categoryList', this.categoryList);
+            this.toastService.presentToast('Sucesso ao deletar categoria','success');
           },
           error: (apiError: any) => {
-            console.log('Unhandled error:', apiError);
+            console.log('Error:', apiError);
           },
         })
     } else {
@@ -192,7 +194,7 @@ export class CategoryListComponent  implements OnInit {
   searchCategoryById(id: number) {
     this.categoryProvider.getById(id).pipe(
       catchError((apiError:any) => {
-        console.log('Ocorreu um erro: ', apiError);
+        this.toastService.presentToast('Erro ao buscar categoria','danger');
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -201,7 +203,7 @@ export class CategoryListComponent  implements OnInit {
         this.categoryList.push(apiData);
       },
       error:(apiError:any) => {
-        console.log('Unhandled Error', apiError)
+        console.log('Error', apiError)
       }
     })
 
