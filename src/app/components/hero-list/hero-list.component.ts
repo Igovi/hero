@@ -154,10 +154,7 @@ export class HeroListComponent implements OnInit {
       this.networkService.networkStatus$.subscribe((isOnline) => {
         this.isOnline = isOnline;
         console.log('Network status updated:', this.isOnline);
-        if (this.isOnline) {
-          // this.heroList = []
-          // this.loadHeroes();
-        } else {
+        if (!this.isOnline) {
           this.loadStoredHeroes();
         }
       });
