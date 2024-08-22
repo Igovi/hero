@@ -109,7 +109,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     if (form.valid) {
       if (this.isOnline) {
         this.sendHeroData(form, false);
-        this.eventEmitterService.hasNewHeroes.emit(true);
+        
       } else {
         this.storeHeroData(form);
         form.reset();
@@ -168,6 +168,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
           );
           form.reset();
           this.modalController.dismiss();
+          this.eventEmitterService.hasNewHeroes.emit(true);
         },
         error: (apiError: any) => {
           console.log('Error:', apiError);

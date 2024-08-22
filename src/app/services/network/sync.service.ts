@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from '../storage/data.service';
 import { HeroProvider } from '../request/providers/hero.provider';
 import { CategoryProvider } from '../request/providers/category.provider';
+import { EventEmitterService } from '../communication/event-emmiter.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,8 @@ export class SyncService {
     private networkService: NetworkService,
     private dataService: DataService,
     private heroProvider: HeroProvider,
-    private categoryprovider: CategoryProvider
+    private categoryprovider: CategoryProvider,
+    private eventEmitterService:EventEmitterService
   ) {}
 
   async networkCheck() {
@@ -31,6 +33,7 @@ export class SyncService {
   }
 
   private async verifySinc() {
+    this.eventEmitterService.isSync.emit(true);
     let heroesToSync = await this.dataService.getData('pendingHeroList');
     let categoriesToSync = await this.dataService.getData(
       'pendingCategoryList'
@@ -44,7 +47,9 @@ export class SyncService {
     if (heroesToSync.length != 0) {
       heroesToSync.forEach((hero: any) =>
         this.heroProvider.post(hero).subscribe(
-          (res) => {},
+          (res) => {
+            
+          },
           (err) => {
             heroesToSyncError.push(hero);
           }
@@ -52,6 +57,7 @@ export class SyncService {
       );
       this.dataService.removeData('pendingHeroList');
       this.dataService.saveData('pendingHeroList', heroesToSyncError);
+      this.eventEmitterService.isSync.emit(false);
     }
 
     if (categoriesToSync.length != 0) {

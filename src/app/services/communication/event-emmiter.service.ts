@@ -12,4 +12,6 @@ export class EventEmitterService {
     @Output() hasNewHeroes = new EventEmitter<boolean>();
     @Output() hasNewCategories = new EventEmitter<boolean>();
 
+    @Output() isSync = new EventEmitter<boolean>();
+
 }

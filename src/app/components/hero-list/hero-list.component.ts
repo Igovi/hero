@@ -31,6 +31,12 @@ export class HeroListComponent implements OnInit {
 
   public hasNewHeroes: Subscription;
 
+  public isSyncEvent: Subscription;
+
+  isSync:boolean = false;
+
+
+
   public searchHero: Subscription;
 
   enableLoad:boolean = false;
@@ -46,22 +52,37 @@ export class HeroListComponent implements OnInit {
   ) { }
   ngOnInit() {
     this.initSubscriptions();
+    this.loadHeroes();
     this.networkCheck();
   }
 
   initSubscriptions() {
+    this.isSyncEvent = this.eventEmitterService.isSync.subscribe(
+      (eventRes) => {
+        this.isSync = eventRes;
+        if(this.isSync == false){
+          this.loadHeroes();
+        }
+      },
+      (eventError) => {
+        console.log(eventError);
+      }
+    )
+
     this.hasNewHeroes = this.eventEmitterService.hasNewHeroes.subscribe(
       (eventRes) => {
         
         if(this.infiniteScroll.disabled){
           this.total += 1;
-          this.take = this.total
-          this.skip = 0;
-        }else{
+          this.skip = 0
+          this.take = this.total;
+        }
+        else{
           this.take = this.skip
           this.skip = 0;
         }
-        if (this.isOnline) {
+
+        if (this.isOnline ) {
           this.loadHeroes();
         } else {
           this.loadStoredHeroes();
@@ -134,7 +155,8 @@ export class HeroListComponent implements OnInit {
         this.isOnline = isOnline;
         console.log('Network status updated:', this.isOnline);
         if (this.isOnline) {
-          this.loadHeroes();
+          // this.heroList = []
+          // this.loadHeroes();
         } else {
           this.loadStoredHeroes();
         }
