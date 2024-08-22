@@ -47,9 +47,12 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     this.dataService.getData('heroList').then((storedHeroList) => {
       this.heroList = storedHeroList;
     });
+    this.dataService.getData('categoryList').then((storedCategoryList) => {
+      this.categories = storedCategoryList;
+    });
     this.pendingHeroList === null ? (this.pendingHeroList = []) : null;
     this.networkCheck();
-    this.loadCategories();
+    this.isOnline ? this.loadCategories() : null
   }
 
   networkCheck() {
@@ -60,6 +63,10 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
           this.syncStoredData();
         }
       });
+  }
+
+  loadStoredCategories(){
+
   }
 
   closeModal() {
