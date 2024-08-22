@@ -212,7 +212,7 @@ export class HeroListComponent implements OnInit {
           this.heroList = [...this.heroList, ...apiData.Items];
           this.skip += this.take;
           this.dataService.saveData('heroList', this.heroList);
-          if (this.heroList.length === this.total) {
+          if (this.heroList.length >= this.total) {
             event.target.disabled = true;
           }
           event.target.complete();

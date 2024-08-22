@@ -1,7 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { catchError, of, Subscription, throwError } from 'rxjs';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
-import { ToastController, LoadingController, ModalController } from '@ionic/angular';
+import {
+  ToastController,
+  LoadingController,
+  ModalController,
+} from '@ionic/angular';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { DataService } from 'src/app/services/storage/data.service';
@@ -35,7 +39,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     private dataService: DataService,
     private eventEmitterService: EventEmitterService,
     private modalController: ModalController,
-    private toastService:ToastService
+    private toastService: ToastService
   ) {}
 
   async ngOnInit() {
@@ -66,7 +70,6 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     const pendingData = await this.dataService.getData('pendingHeroList');
     pendingData.forEach(async (hero: any) => {
       await this.sendHeroData(hero, true);
-      this.eventEmitterService.hasNewHeroes.emit(true);
     });
     this.dataService.removeData('pendingHeroList');
   }
@@ -82,7 +85,10 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Ocorreu um erro ao carregar as categorias.','danger');
+          this.toastService.presentToast(
+            'Ocorreu um erro ao carregar as categorias.',
+            'danger'
+          );
           loading.dismiss();
           return throwError(() => apiError);
         })
@@ -99,27 +105,37 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       });
   }
 
-  
-
   onSubmit(form: any) {
-    if (form.valid && this.isOnline) {
-      this.sendHeroData(form, false);
-      this.eventEmitterService.hasNewHeroes.emit(true);
+    if (form.valid) {
+      if (this.isOnline) {
+        this.sendHeroData(form, false);
+        this.eventEmitterService.hasNewHeroes.emit(true);
+      } else {
+        this.storeHeroData(form);
+        form.reset();
+        this.modalController.dismiss();
+      }
     } else {
-      this.isOnline
-        ? console.log('Formulário inválido!')
-        : this.storeHeroData(form);
+      console.log('Formulário inválido!');
     }
   }
 
   async storeHeroData(form: any) {
-    let data = {
+    let dataPost = {
       Name: this.hero.name,
       CategoryId: this.hero.category,
       Active: this.hero.active,
     };
-    this.pendingHeroList.push(data);
-    this.heroList.push(data);
+
+    let dataGet = {
+      Name: this.hero.name,
+      Category: this.categories.find(
+        (categorie) => categorie.Id === this.hero.category
+      ),
+      Active: this.hero.active,
+    };
+    this.pendingHeroList.push(dataPost);
+    this.heroList.push(dataGet);
     this.dataService.saveData('pendingHeroList', this.pendingHeroList);
     await this.dataService.saveData('heroList', this.heroList);
     this.eventEmitterService.hasNewHeroes.emit(true);
@@ -136,14 +152,20 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       .post(isStored ? form : data)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Ocorreu um erro ao enviar o herói','danger')
+          this.toastService.presentToast(
+            'Ocorreu um erro ao enviar o herói',
+            'danger'
+          );
           console.log('Ocorreu um erro: ', apiError);
           return throwError(() => apiError);
         })
       )
       .subscribe({
         next: async (apiData: any) => {
-          this.toastService.presentToast('Herói enviado com sucesso.','success');
+          this.toastService.presentToast(
+            'Herói enviado com sucesso.',
+            'success'
+          );
           form.reset();
           this.modalController.dismiss();
         },
