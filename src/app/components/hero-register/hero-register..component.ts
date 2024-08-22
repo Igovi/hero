@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { catchError, of, Subscription } from 'rxjs';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { ToastController, LoadingController, ModalController } from '@ionic/angular';
 import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { DataService } from 'src/app/services/storage/data.service';
@@ -33,7 +33,8 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     private heroProvider: HeroProvider,
     private networkService: NetworkService,
     private dataService: DataService,
-    private eventEmitterService: EventEmitterService
+    private eventEmitterService: EventEmitterService,
+    private modalController: ModalController
   ) {}
 
   async ngOnInit() {
@@ -54,6 +55,10 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
           this.syncStoredData();
         }
       });
+  }
+
+  closeModal() {
+    this.modalController.dismiss();
   }
 
   private async syncStoredData() {

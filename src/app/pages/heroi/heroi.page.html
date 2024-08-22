@@ -2,4 +2,9 @@
   <app-header [hasArrow]="false"></app-header>
   <app-search-bar [heroPage]="true"></app-search-bar>
   <app-hero-list></app-hero-list>
+  <ion-fab style="margin-right: 15px;" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openRegisterModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

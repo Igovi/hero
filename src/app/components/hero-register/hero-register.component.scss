@@ -1,3 +1,23 @@
+.register__HeaderContainer {
+  display: flex;
+  justify-content: flex-end;
+
+  .register__HeaderButton {
+    margin-top: 15px;
+    margin-right: 25px;
+    width: auto; 
+    height: auto;
+    --color: #202020;
+    --border-color: #D9D9D9;
+    --background: #bebebe;
+    padding: 0; 
+
+    ion-icon {
+      font-size: 25px; // Define o tamanho normal do ícone
+    }
+  }
+}
+
 .register__container {
   display: flex;
   flex-direction: column;

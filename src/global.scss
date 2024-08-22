@@ -39,3 +39,10 @@
 ion-content{
     --background: #d9d9d9;
 }
+
+.modal {
+    width: 100%; /* Define a largura da modal */
+    height: 100%; /* Define a altura da modal */
+    margin: auto; /* Centraliza a modal */
+    position: relative;
+  }
