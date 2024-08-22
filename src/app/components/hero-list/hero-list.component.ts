@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
+import { AlertController, InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
 import { catchError, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Hero } from 'src/app/models/hero.model';
@@ -23,7 +23,7 @@ export class HeroListComponent implements OnInit {
   public isOnline: boolean = false;
   private networkStatusSubscription: Subscription;
 
-  
+
 
   total: number = 0;
   skip: number = 0;
@@ -33,14 +33,14 @@ export class HeroListComponent implements OnInit {
 
   public isSyncEvent: Subscription;
 
-  public isSync:boolean = false;
+  public isSync: boolean = false;
 
 
 
   public searchHero: Subscription;
 
-  enableLoad:boolean = false;
-  
+  enableLoad: boolean = false;
+
 
   constructor(
     private heroProvider: HeroProvider,
@@ -48,7 +48,8 @@ export class HeroListComponent implements OnInit {
     private networkService: NetworkService,
     private eventEmitterService: EventEmitterService,
     private router: Router,
-    private toastService:ToastService
+    private toastService: ToastService,
+    private alertController: AlertController
   ) { }
   ngOnInit() {
     this.initSubscriptions();
@@ -60,7 +61,7 @@ export class HeroListComponent implements OnInit {
     this.isSyncEvent = this.eventEmitterService.isSync.subscribe(
       (eventRes) => {
         this.isSync = eventRes;
-        if(this.isSync == false){
+        if (this.isSync == false) {
           this.loadHeroes();
         }
       },
@@ -71,18 +72,18 @@ export class HeroListComponent implements OnInit {
 
     this.hasNewHeroes = this.eventEmitterService.hasNewHeroes.subscribe(
       (eventRes) => {
-        
-        if(this.infiniteScroll.disabled){
+
+        if (this.infiniteScroll.disabled) {
           this.total += 1;
           this.skip = 0
           this.take = this.total;
         }
-        else{
+        else {
           this.take = this.skip
           this.skip = 0;
         }
 
-        if (this.isOnline ) {
+        if (this.isOnline) {
           this.loadHeroes();
         } else {
           this.loadStoredHeroes();
@@ -95,20 +96,20 @@ export class HeroListComponent implements OnInit {
     this.searchHero = this.eventEmitterService.currentSearchInputHero.subscribe(
       (eventRes) => {
         this.enableLoad = false;
-        if(String(eventRes) === ''){
-          if(this.infiniteScroll === undefined){
+        if (String(eventRes) === '') {
+          if (this.infiniteScroll === undefined) {
             this.take = this.skip
             this.skip = 0;
           }
-          else if(this.infiniteScroll.disabled){
+          else if (this.infiniteScroll.disabled) {
             this.take = this.total
             this.skip = 0;
-          }else{
+          } else {
             this.take = this.skip
             this.skip = 0;
           }
           this.loadHeroes()
-        }else{
+        } else {
           this.searchHeroById(eventRes);
         }
       },
@@ -124,7 +125,7 @@ export class HeroListComponent implements OnInit {
       .get(this.skip, this.take)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Ocorreu um erro ao carregar os Herois.','danger');
+          this.toastService.presentToast('Ocorreu um erro ao carregar os Herois.', 'danger');
           return throwError(() => apiError);
         })
       )
@@ -169,7 +170,7 @@ export class HeroListComponent implements OnInit {
     if (this.isOnline) {
       this.heroProvider.delete(hero.Id).pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Ocorreu um erro ao Deletar o Herois.','danger');
+          this.toastService.presentToast('Ocorreu um erro ao Deletar o Herois.', 'danger');
           return throwError(() => apiError);
         }
         )).subscribe({
@@ -181,7 +182,7 @@ export class HeroListComponent implements OnInit {
             }
 
             this.dataService.saveData('heroList', this.heroList);
-            this.toastService.presentToast('Herói deletado com sucesso','success');
+            this.toastService.presentToast('Herói deletado com sucesso', 'success');
           },
           error: (apiError: any) => {
             console.log('Error:', apiError);
@@ -201,16 +202,16 @@ export class HeroListComponent implements OnInit {
 
   searchHeroById(id: number) {
     this.heroProvider.getById(id).pipe(
-      catchError((apiError:any) => {
-        this.toastService.presentToast('Erro ao buscar herói','danger');
+      catchError((apiError: any) => {
+        this.toastService.presentToast('Erro ao buscar herói', 'danger');
         return throwError(() => apiError);
       })
     ).subscribe({
-      next: (apiData:any) => {
+      next: (apiData: any) => {
         this.heroList.length = 0;
         this.heroList.push(apiData);
       },
-      error:(apiError:any) => {
+      error: (apiError: any) => {
         console.log('Error', apiError)
       }
     })
@@ -218,28 +219,38 @@ export class HeroListComponent implements OnInit {
   }
 
   loadMore(event: InfiniteScrollCustomEvent): void {
-    this.heroProvider
-      .get(this.skip, this.take)
-      .pipe(
-        catchError((apiError: any) => {
-          this.toastService.presentToast('Erro ao buscar mais heróis','danger');
-          return throwError(() => apiError);
-        })
-      )
-      .subscribe({
-        next: (apiData: any) => {
-          this.heroList = [...this.heroList, ...apiData.Items];
-          this.skip += this.take;
-          this.dataService.saveData('heroList', this.heroList);
-          if (this.heroList.length >= this.total) {
-            event.target.disabled = true;
-          }
-          event.target.complete();
-        },
-        error: (apiError: any) => {
-          
-          console.log('Error:', apiError);
-        },
-      });
+    if (this.isOnline) {
+      this.heroProvider
+        .get(this.skip, this.take)
+        .pipe(
+          catchError((apiError: any) => {
+            this.toastService.presentToast('Erro ao buscar mais heróis', 'danger');
+            return throwError(() => apiError);
+          })
+        )
+        .subscribe({
+          next: (apiData: any) => {
+            this.heroList = [...this.heroList, ...apiData.Items];
+            this.skip += this.take;
+            this.dataService.saveData('heroList', this.heroList);
+            if (this.heroList.length >= this.total) {
+              event.target.disabled = true;
+            }
+            event.target.complete();
+          },
+          error: (apiError: any) => {
+
+            console.log('Error:', apiError);
+          },
+        });
+    } else {
+      this.toastService.presentToast('Você está offline. Conecte-se à internet para carregar mais heróis.', 'danger');
+      event.target.complete()
+    }
   }
+
+  
+
+
+
 }

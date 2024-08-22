@@ -157,25 +157,31 @@ export class CategoryListComponent  implements OnInit {
   }
 
   loadMore(event: InfiniteScrollCustomEvent): void {
-    this.categoryProvider.get(this.skip, this.take).pipe(
-      catchError((apiError: any) => {
-        this.toastService.presentToast('Erro ao carregar mais categoria','danger');
-        return throwError(() => apiError);
-      })
-    ).subscribe({
-      next: (apiData: any) => {
-        this.categoryList = [...this.categoryList, ...apiData.Items];
-        this.skip += this.take;
-        this.dataService.saveData('categoryList', this.categoryList);
-        if (this.categoryList.length === this.total) {
-          event.target.disabled = true;
+    if(this.isOnline){
+      this.categoryProvider.get(this.skip, this.take).pipe(
+        catchError((apiError: any) => {
+          this.toastService.presentToast('Erro ao carregar mais categoria','danger');
+          return throwError(() => apiError);
+        })
+      ).subscribe({
+        next: (apiData: any) => {
+          this.categoryList = [...this.categoryList, ...apiData.Items];
+          this.skip += this.take;
+          this.dataService.saveData('categoryList', this.categoryList);
+          if (this.categoryList.length === this.total) {
+            event.target.disabled = true;
+          }
+          event.target.complete();
+        },
+        error: (apiError: any) => {
+          console.log('Error:', apiError);
         }
-        event.target.complete();
-      },
-      error: (apiError: any) => {
-        console.log('Error:', apiError);
-      }
-    });
+      });
+    }else{
+      this.toastService.presentToast('Você está offline. Conecte-se à internet para carregar mais heróis.', 'danger');
+      event.target.complete()
+    }
+    
   }
   editCategory(category: any) {
     console.log('Editar herói:', category);
