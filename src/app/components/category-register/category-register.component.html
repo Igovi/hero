@@ -1,0 +1,55 @@
+<ion-content>
+  <div class="register__ModalContainer">
+    <div class="register__HeaderContainer">
+      <ion-button class="register__HeaderButton" (click)="closeModal()">
+        <ion-icon class="register__HeaderIcon" name="close"></ion-icon>
+      </ion-button>
+    </div>
+    
+        
+    <form #categoryForm="ngForm" (ngSubmit)="onSubmit(categoryForm)">
+      <div class="register__container">
+        <div class="register__title">Cadastro de Heróis</div>
+  
+        <div class="register__inputName">
+          <ion-item class="register__inputNameCotainer">
+            <ion-input
+              class="register_input"
+              type="text"
+              name="categoryName"
+              fill="outline"
+              placeholder="Nome"
+              label="Nome"
+              label-placement="floating"
+              [(ngModel)]="category.Name"
+              required
+              minlength="3"
+              #categoryName="ngModel"
+            ></ion-input>
+          </ion-item>
+          <div
+            *ngIf="categoryName.invalid && (categoryName.dirty || categoryName.touched)"
+            class="error"
+          >
+            <div *ngIf="categoryName.errors?.['required']">Nome é obrigatório.</div>
+            <div *ngIf="categoryName.errors?.['minlength']">
+              Nome deve ter pelo menos 3 caracteres.
+            </div>
+          </div>
+        </div>
+  
+        <div class="register__submitButton">
+          <ion-button
+            type="submit"
+            [disabled]="categoryForm.invalid"
+            class="register__button"
+          >
+            Cadastrar
+          </ion-button>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  
+</ion-content>

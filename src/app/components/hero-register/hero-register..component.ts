@@ -153,7 +153,6 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
         next: async (apiData: any) => {
           this.presentToast('Herói enviado com sucesso.');
           form.reset();
-          this.hero.active = true;
         },
         error: (apiError: any) => {
           this.presentToast('Ocorreu um erro inesperado.');

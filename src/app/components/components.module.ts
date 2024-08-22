@@ -7,11 +7,12 @@ import { HeaderComponent } from './header/header.component';
 import { HeroListComponent } from './hero-list/hero-list.component';
 import { CategoryListComponent } from './category-list/category-list.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
+import { CategoryRegisterComponent } from './category-register/category-register.component';
 
 
 @NgModule({
-  declarations: [HeroRegisterComponent, HeaderComponent,HeroListComponent,CategoryListComponent,SearchBarComponent],
+  declarations: [HeroRegisterComponent, HeaderComponent,HeroListComponent,CategoryListComponent,SearchBarComponent,CategoryRegisterComponent],
   imports: [CommonModule, FormsModule, IonicModule],
-  exports: [HeroRegisterComponent, HeaderComponent,HeroListComponent,CategoryListComponent,SearchBarComponent],
+  exports: [HeroRegisterComponent, HeaderComponent,HeroListComponent,CategoryListComponent,SearchBarComponent,CategoryRegisterComponent],
 })
 export class ComponentsModule {}
