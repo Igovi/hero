@@ -52,6 +52,8 @@ export class CategoryListComponent  implements OnInit {
       (eventRes) => {
         this.isSync = eventRes;
         if(this.isSync == false){
+          this.skip = 0;
+          this.infiniteScroll.disabled ? this.take = this.total : this.take = 3;
           this.loadCategories();
         }
       },
@@ -70,7 +72,7 @@ export class CategoryListComponent  implements OnInit {
           this.take = this.skip
           this.skip = 0;
         }
-        if (this.isOnline) {
+        if (this.isOnline && this.isSync == false) {
           this.loadCategories();
         } else {
           this.loadStoredCategories();
