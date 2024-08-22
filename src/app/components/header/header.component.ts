@@ -7,13 +7,13 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  @Input() hasArrow: boolean = true; // Input para habilitar/desabilitar a seta
+  @Input() hasArrow: boolean = true;
 
   constructor(private navCtrl: NavController) {}
 
   goBack() {
     if (this.hasArrow) {
-      this.navCtrl.back(); // Navega de volta para a página anterior se habilitado
+      this.navCtrl.back();
     }
   }
 }

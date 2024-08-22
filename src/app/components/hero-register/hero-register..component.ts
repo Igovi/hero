@@ -19,7 +19,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
   hero = {
     name: '',
     category: '',
-    active: true, // Default value as true for "Vivo"
+    active: true,
   };
 
   categories: any[] = [];
