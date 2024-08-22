@@ -28,6 +28,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
   };
 
   categories: any[] = [];
+
   pendingHeroList: any[] = [];
   heroList: any[] = [];
 
@@ -47,8 +48,8 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     this.dataService.getData('heroList').then((storedHeroList) => {
       this.heroList = storedHeroList;
     });
-    this.dataService.getData('categoryList').then((storedCategoryList) => {
-      this.categories = storedCategoryList;
+    this.dataService.getData('fullCategoryList').then((storedFullCategoryList) => {
+      this.categories = storedFullCategoryList;
     });
     this.pendingHeroList === null ? (this.pendingHeroList = []) : null;
     this.networkCheck();
@@ -63,10 +64,6 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
           this.syncStoredData();
         }
       });
-  }
-
-  loadStoredCategories(){
-
   }
 
   closeModal() {
@@ -103,6 +100,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (apiData: any) => {
           this.categories = apiData.Items;
+          this.dataService.saveData('fullCategoryList',this.categories);
           loading.dismiss();
         },
         error: (apiError: any) => {

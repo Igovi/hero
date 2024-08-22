@@ -152,6 +152,8 @@ export class CategoryListComponent  implements OnInit {
         console.log('Network status updated:', this.isOnline);
         if (!this.isOnline) {
           this.loadStoredCategories();
+        }else{
+          this.skip = 0;
         }
       });
   }

@@ -157,6 +157,8 @@ export class HeroListComponent implements OnInit {
         console.log('Network status updated:', this.isOnline);
         if (!this.isOnline) {
           this.loadStoredHeroes();
+        }else{
+          this.skip = 0;
         }
       });
   }
