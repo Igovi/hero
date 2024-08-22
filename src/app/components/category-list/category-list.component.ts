@@ -168,7 +168,7 @@ export class CategoryListComponent  implements OnInit {
           this.categoryList = [...this.categoryList, ...apiData.Items];
           this.skip += this.take;
           this.dataService.saveData('categoryList', this.categoryList);
-          if (this.categoryList.length === this.total) {
+          if (this.categoryList.length === this.total || this.skip > this.total) {
             event.target.disabled = true;
           }
           event.target.complete();
