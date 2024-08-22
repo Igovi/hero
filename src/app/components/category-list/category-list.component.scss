@@ -1,6 +1,6 @@
 
   .category__card {
-    border-radius: 2px;
+    border-radius: 25px;
     --background: #888888;
     --color: #fff;
     display: flex;
@@ -17,9 +17,11 @@
     .category__cardRight {
       margin: 5%;
         .category__iconEdit{
+          font-size: 30px;
           color: #202020
         }
         .category__iconRemove{
+          font-size: 30px;
         }
       
     }

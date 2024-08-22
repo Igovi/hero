@@ -1,5 +1,5 @@
 .hero__card {
-    border-radius: 2px;
+    border-radius: 25px;
   --background: #888888;
   --color: #fff;
     display: flex;
@@ -10,9 +10,10 @@
       margin: 15px;
       .hero__title{
         --color: #fff;
-        font-size: 25px;
+        font-size: 20px;
       }
       .hero__subtitle{
+        font-size: 15px;
         margin-top: 5px;
         margin-bottom: 0px;
       }
@@ -38,9 +39,11 @@
     .hero__cardRight {
       margin: 5%;
       .hero__iconEdit{
+        font-size: 30px;
         color: #202020
       }
       .hero__iconRemove{
+        font-size: 30px;
       }
     }
   }
