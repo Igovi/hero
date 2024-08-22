@@ -33,16 +33,33 @@ export class CategoryListComponent  implements OnInit {
 
   public searchCategory:Subscription;
 
+  public isSyncEvent: Subscription;
+
+  public isSync:boolean = false;
+
   enableLoad:boolean = false;
   
   constructor(private router: Router,private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService,private toastService:ToastService) {}
 
   ngOnInit() {
     this.initSubscriptions();
+    this.loadCategories();
     this.networkCheck();
   }
   
   initSubscriptions() {
+    this.isSyncEvent = this.eventEmitterService.isSync.subscribe(
+      (eventRes) => {
+        this.isSync = eventRes;
+        if(this.isSync == false){
+          this.loadCategories();
+        }
+      },
+      (eventError) => {
+        console.log(eventError);
+      }
+    )
+
     this.hasNewCategories = this.eventEmitterService.hasNewCategories.subscribe(
       (eventRes) => {
         if(this.infiniteScroll.disabled){
@@ -91,6 +108,14 @@ export class CategoryListComponent  implements OnInit {
     );
   }
 
+  loadStoredHeroes() {
+    this.dataService.getData('categoryList').then((storedCategoryList) => {
+      if (storedCategoryList) {
+        this.categoryList = storedCategoryList;
+      }
+    });
+  }
+
   loadCategories() {
     this.enableLoad = true;
     this.categoryProvider.get(this.skip,this.take).pipe(
@@ -121,15 +146,14 @@ export class CategoryListComponent  implements OnInit {
   }
 
   networkCheck(){
-    this.networkStatusSubscription = this.networkService.networkStatus$.subscribe(isOnline => {
-      this.isOnline = isOnline;
-      console.log('Network status updated:', this.isOnline);
-      if (this.isOnline) {
-        this.loadCategories();
-      } else {
-        this.loadStoredCategories();
-      }
-    });
+    this.networkStatusSubscription =
+      this.networkService.networkStatus$.subscribe((isOnline) => {
+        this.isOnline = isOnline;
+        console.log('Network status updated:', this.isOnline);
+        if (!this.isOnline) {
+          this.loadStoredCategories();
+        }
+      });
   }
 
   loadMore(event: InfiniteScrollCustomEvent): void {
@@ -206,6 +230,6 @@ export class CategoryListComponent  implements OnInit {
         console.log('Error', apiError)
       }
     })
-
   }
+  
 }

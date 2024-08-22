@@ -33,7 +33,7 @@ export class HeroListComponent implements OnInit {
 
   public isSyncEvent: Subscription;
 
-  isSync:boolean = false;
+  public isSync:boolean = false;
 
 
 

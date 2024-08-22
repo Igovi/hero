@@ -55,9 +55,10 @@ export class SyncService {
           }
         )
       );
+      
       this.dataService.removeData('pendingHeroList');
       this.dataService.saveData('pendingHeroList', heroesToSyncError);
-      this.eventEmitterService.isSync.emit(false);
+      
     }
 
     if (categoriesToSync.length != 0) {
@@ -72,5 +73,6 @@ export class SyncService {
       this.dataService.removeData('pendingCategoryList');
       this.dataService.saveData('pendingCategoryList', categoriesToSyncError);
     }
+    this.eventEmitterService.isSync.emit(false);
   }
 }

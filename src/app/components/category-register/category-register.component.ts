@@ -1,29 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { catchError, of, throwError } from 'rxjs';
+import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { EventEmitterService } from 'src/app/services/communication/event-emmiter.service';
 import { ToastService } from 'src/app/services/communication/toast.service';
 import { NetworkService } from 'src/app/services/network/network.service';
 import { CategoryProvider } from 'src/app/services/request/providers/category.provider';
+import { DataService } from 'src/app/services/storage/data.service';
 
 @Component({
   selector: 'app-category-register',
   templateUrl: './category-register.component.html',
   styleUrls: ['./category-register.component.scss'],
 })
-export class CategoryRegisterComponent   {
+export class CategoryRegisterComponent implements OnInit, OnDestroy   {
+  private networkStatusSubscription: Subscription;
   isOnline: boolean = true
   category:Category = {
     Name: '',
     Id:0
   }
+  pendingCategoryList: any[] = [];
+
+  categoryList: any[] = [];
 
   constructor(private eventEmitterService: EventEmitterService,
     private modalController: ModalController,
     private categoryProvider: CategoryProvider,
     private networkService: NetworkService,
-    private toastService:ToastService) { }
+    private toastService:ToastService,
+    private dataService: DataService,) { }
 
   
 
@@ -31,14 +37,39 @@ export class CategoryRegisterComponent   {
     this.modalController.dismiss();
   }
 
+  async ngOnInit() {
+    this.pendingCategoryList = await this.dataService.getData('pendingCategoryList');
+    this.dataService.getData('categoryList').then((storedCategoryList) => {
+      this.categoryList = storedCategoryList;
+    });
+    this.pendingCategoryList === null ? (this.pendingCategoryList = []) : null;
+    this.networkCheck();
+  }
+
   onSubmit(form: any) {
-    if (form.valid && this.isOnline) {
-      this.sendCategoryData(form, false);
+    if (form.valid) {
+      if (this.isOnline) {
+        this.sendCategoryData(form, false);
+        
+      } else {
+        this.storeCategoryData(form);
+        form.reset();
+        this.modalController.dismiss();
+      }
     } else {
-      // this.isOnline
-      //   ? console.log('Formulário inválido!')
-      //   : this.sendCategoryData(form,false);
+      console.log('Formulário inválido!');
     }
+  }
+
+  async storeCategoryData(form: any) {
+    let data = {
+      Name: this.category.Name,
+    };
+    this.pendingCategoryList.push(data);
+    this.categoryList.push(data);
+    this.dataService.saveData('pendingCategoryList', this.pendingCategoryList);
+    await this.dataService.saveData('categoryList', this.categoryList);
+    this.eventEmitterService.hasNewCategories.emit(true);
   }
 
   sendCategoryData(form: any, isStored: boolean) {
@@ -66,4 +97,29 @@ export class CategoryRegisterComponent   {
       });
   }
 
+  networkCheck() {
+    this.networkStatusSubscription =
+      this.networkService.networkStatus$.subscribe((isOnline) => {
+        this.isOnline = isOnline;
+        if (this.isOnline && this.pendingCategoryList.length !== 0) {
+          this.syncStoredData();
+        }
+      });
+  }
+
+  private async syncStoredData() {
+    const pendingData = await this.dataService.getData('pendingCategoryList');
+    pendingData.forEach(async (category: any) => {
+      await this.sendCategoryData(category, true);
+    });
+    this.dataService.removeData('pendingCategoryList');
+  }
+  ngOnDestroy() {
+    if (this.networkStatusSubscription) {
+      this.networkStatusSubscription.unsubscribe();
+    }
+  }
+
+
+  
 }
