@@ -29,7 +29,6 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
 
   constructor(
     private categoryProvider: CategoryProvider,
-    private toastController: ToastController,
     private loadingController: LoadingController,
     private heroProvider: HeroProvider,
     private networkService: NetworkService,

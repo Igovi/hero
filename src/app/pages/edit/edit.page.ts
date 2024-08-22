@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
 import { Hero } from 'src/app/models/hero.model';
@@ -54,7 +55,7 @@ export class EditPage implements OnInit {
 
 
 
-  constructor(private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService,private toastService:ToastService) { }
+  constructor(private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService,private toastService:ToastService,private loadingController: LoadingController,) { }
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -104,17 +105,24 @@ export class EditPage implements OnInit {
   }
 
   async loadCategories() {
+    const loading = await this.loadingController.create({
+      message: 'Carregando categorias...',
+      spinner: 'circles',
+    });
+    await loading.present();
     this.categoryProvider
       .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
           this.toastService.presentToast('Erro ao buscar a lista de categorias','danger');
+          loading.dismiss();
           return throwError(() => apiError);
         })
       )
       .subscribe({
         next: (apiData: any) => {
           this.categoryList = apiData.Items;
+          loading.dismiss();
         },
         error: (apiError: any) => {
           console.log('Error:', apiError);
