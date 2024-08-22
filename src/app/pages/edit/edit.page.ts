@@ -15,6 +15,8 @@ import { HeroProvider } from 'src/app/services/request/providers/hero.provider';
 })
 export class EditPage implements OnInit {
 
+  isCategoryEdit:boolean = false;
+
   hero: Hero = {
     Name: '',
     Category: {
@@ -34,10 +36,16 @@ export class EditPage implements OnInit {
     Id: 0
   }
 
+  category:Category = {
+    Name: '',
+    Id:0
+  }
+
   heroName = '';
 
   categoryList: Category[] = []
 
+  id:number = -1;
 
   public isOnline: boolean = true;
 
@@ -48,9 +56,16 @@ export class EditPage implements OnInit {
   constructor(private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService) { }
 
   ngOnInit() {
-    this.hero.Id = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadCategories();
-    this.searchHeroById(this.hero.Id);
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
+    console.log(this.router.url);
+    if(this.router.url.includes('categoria')){
+      this.isCategoryEdit = true
+      this.searchCategoryById(this.id)
+    }else{
+      this.isCategoryEdit = false;
+      this.searchHeroById(this.id);
+      this.loadCategories();
+    }    
   }
   searchHeroById(id: number) {
     this.heroProvider.getById(id).pipe(
@@ -61,6 +76,23 @@ export class EditPage implements OnInit {
     ).subscribe({
       next: (apiData: any) => {
         this.hero = apiData;
+      },
+      error: (apiError: any) => {
+        console.log('Unhandled Error', apiError)
+      }
+    })
+
+  }
+
+  searchCategoryById(id: number) {
+    this.categoryProvider.getById(id).pipe(
+      catchError((apiError: any) => {
+        console.log('Ocorreu um erro: ', apiError);
+        return throwError(() => apiError);
+      })
+    ).subscribe({
+      next: (apiData: any) => {
+        this.category = apiData;
       },
       error: (apiError: any) => {
         console.log('Unhandled Error', apiError)
@@ -88,7 +120,7 @@ export class EditPage implements OnInit {
       });
   }
 
-  onSubmit(form: any) {
+  onEditHero(form: any) {
     if (form.valid && this.isOnline) {
       this.sendHeroData(form, false);
       // this.eventEmitterService.hasNewHeroes.emit(true);
@@ -120,6 +152,46 @@ export class EditPage implements OnInit {
           form.reset();
           this.eventEmitterService.hasNewHeroes.emit(true);
           this.router.navigate([`heroi`]);
+        },
+        error: (apiError: any) => {
+
+          console.log('Unhandled error:', apiError);
+        },
+      });
+  }
+
+  onEditCategory(form:any){
+    if (form.valid && this.isOnline) {
+      this.sendCategoryData(form, false);
+      // this.eventEmitterService.hasNewHeroes.emit(true);
+    } else {
+      // this.isOnline
+      //   ? console.log('Formulário inválido!')
+      //   : this.storeHeroData(form);
+    }
+
+  }
+
+  sendCategoryData(form: any, isStored: boolean) {
+    let data = {
+      Name: this.category.Name,
+    };
+
+    this.categoryProvider
+      .put(this.category.Id, isStored ? form : data)
+      .pipe(
+        catchError((apiError: any) => {
+
+          console.log('Ocorreu um erro: ', apiError);
+          return of([]);
+        })
+      )
+      .subscribe({
+        next: async (apiData: any) => {
+
+          form.reset();
+          this.eventEmitterService.hasNewCategories.emit(true);
+          this.router.navigate([`categoria`]);
         },
         error: (apiError: any) => {
 

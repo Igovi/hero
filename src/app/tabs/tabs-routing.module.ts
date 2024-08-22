@@ -22,6 +22,10 @@ const routes: Routes = [
         loadChildren: () => import('../pages/categoria/categoria.module').then(m => m.CategoriaPageModule)
       },
       {
+        path: 'categoria/:id',
+        loadChildren: () => import('../pages/edit/edit.module').then(m => m.EditPageModule)
+      },
+      {
         path: 'cadastrar',
         loadChildren: () => import('../pages/cadastrar/cadastrar.module').then(m => m.CadastrarPageModule)
       },

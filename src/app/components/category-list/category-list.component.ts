@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { InfiniteScrollCustomEvent, IonInfiniteScroll } from '@ionic/angular';
 import { catchError, of, Subscription, throwError } from 'rxjs';
 import { Category } from 'src/app/models/category.model';
@@ -33,7 +34,7 @@ export class CategoryListComponent  implements OnInit {
 
   enableLoad:boolean = false;
   
-  constructor(private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService) {}
+  constructor(private router: Router,private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService) {}
 
   ngOnInit() {
     this.initSubscriptions();
@@ -41,10 +42,16 @@ export class CategoryListComponent  implements OnInit {
   }
   
   initSubscriptions() {
-    this.hasNewCategories = this.eventEmitterService.hasNewHeroes.subscribe(
+    this.hasNewCategories = this.eventEmitterService.hasNewCategories.subscribe(
       (eventRes) => {
-        this.skip = 0;
-        this.take = 3;
+        if(this.infiniteScroll.disabled){
+          this.total += 1;
+          this.take = this.total
+          this.skip = 0;
+        }else{
+          this.take = this.skip
+          this.skip = 0;
+        }
         if (this.isOnline) {
           this.loadCategories();
         } else {
@@ -147,6 +154,7 @@ export class CategoryListComponent  implements OnInit {
   }
   editCategory(category: any) {
     console.log('Editar herói:', category);
+    this.router.navigate([`categoria/${category.Id}`]);
   }
 
   deleteCategory(category: any) {
