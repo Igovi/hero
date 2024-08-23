@@ -98,6 +98,7 @@ export class CategoryRegisterComponent implements OnInit, OnDestroy   {
   }
 
   networkCheck() {
+    
     this.networkStatusSubscription =
       this.networkService.networkStatus$.subscribe((isOnline) => {
         this.isOnline = isOnline;
@@ -108,11 +109,13 @@ export class CategoryRegisterComponent implements OnInit, OnDestroy   {
   }
 
   private async syncStoredData() {
+    this.eventEmitterService.isSync.emit(true);
     const pendingData = await this.dataService.getData('pendingCategoryList');
     pendingData.forEach(async (category: any) => {
       await this.sendCategoryData(category, true);
     });
     this.dataService.removeData('pendingCategoryList');
+    this.eventEmitterService.isSync.emit(false);
   }
   ngOnDestroy() {
     if (this.networkStatusSubscription) {

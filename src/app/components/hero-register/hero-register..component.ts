@@ -71,11 +71,13 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
   }
 
   private async syncStoredData() {
+    this.eventEmitterService.isSync.emit(true);
     const pendingData = await this.dataService.getData('pendingHeroList');
     pendingData.forEach(async (hero: any) => {
       await this.sendHeroData(hero, true);
     });
     this.dataService.removeData('pendingHeroList');
+    this.eventEmitterService.isSync.emit(true);
   }
 
   async loadCategories() {
