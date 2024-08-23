@@ -35,7 +35,7 @@ export class HeroListComponent implements OnInit {
 
   public isSync: boolean = false;
 
-
+  pendingDelete: any[] = [];
 
   public searchHero: Subscription;
 
@@ -158,6 +158,12 @@ export class HeroListComponent implements OnInit {
         if (!this.isOnline) {
           this.loadStoredHeroes();
         }else{
+          if(this.pendingDelete.length !== 0){
+                this.pendingDelete.forEach(async (hero: any) => {
+                  await this.deleteHero(hero);
+                });
+                this.pendingDelete = [];
+          }
           this.skip = 0;
         }
       });
@@ -185,6 +191,7 @@ export class HeroListComponent implements OnInit {
 
             this.dataService.saveData('heroList', this.heroList);
             this.toastService.presentToast('Herói deletado com sucesso', 'success');
+            this.eventEmitterService.hasNewCategories.emit();
           },
           error: (apiError: any) => {
             console.log('Error:', apiError);
@@ -198,6 +205,7 @@ export class HeroListComponent implements OnInit {
       }
 
       this.dataService.saveData('heroList', this.heroList);
+      this.pendingDelete.push(hero);
     }
 
   }

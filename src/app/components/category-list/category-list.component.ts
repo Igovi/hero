@@ -217,6 +217,7 @@ export class CategoryListComponent  implements OnInit {
 
             this.dataService.saveData('categoryList', this.categoryList);
             this.toastService.presentToast('Sucesso ao deletar categoria','success');
+            this.eventEmitterService.hasNewCategories.emit();
           },
           error: (apiError: any) => {
             console.log('Error:', apiError);
@@ -231,6 +232,7 @@ export class CategoryListComponent  implements OnInit {
 
       this.dataService.saveData('categoryList', this.categoryList);
       this.pendingDelete.push(category);
+      
     }
   }
 
