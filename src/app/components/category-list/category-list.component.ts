@@ -37,6 +37,8 @@ export class CategoryListComponent  implements OnInit {
 
   public isSync:boolean = false;
 
+  pendingDelete: any[] = [];
+
   enableLoad:boolean = false;
   
   constructor(private router: Router,private categoryProvider: CategoryProvider,private networkService: NetworkService, private dataService: DataService,private eventEmitterService:EventEmitterService,private toastService:ToastService) {}
@@ -149,12 +151,18 @@ export class CategoryListComponent  implements OnInit {
 
   networkCheck(){
     this.networkStatusSubscription =
-      this.networkService.networkStatus$.subscribe((isOnline) => {
+      this.networkService.networkStatus$.subscribe(async (isOnline) => {
         this.isOnline = isOnline;
         console.log('Network status updated:', this.isOnline);
         if (!this.isOnline) {
           this.loadStoredCategories();
         }else{
+          if(this.pendingDelete.length !== 0){
+                this.pendingDelete.forEach(async (category: any) => {
+                  await this.deleteCategory(category);
+                });
+                this.pendingDelete = [];
+          }
           this.skip = 0;
         }
       });
@@ -222,6 +230,7 @@ export class CategoryListComponent  implements OnInit {
       }
 
       this.dataService.saveData('categoryList', this.categoryList);
+      this.pendingDelete.push(category);
     }
   }
 
