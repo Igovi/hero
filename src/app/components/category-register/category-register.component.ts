@@ -67,6 +67,7 @@ export class CategoryRegisterComponent implements OnInit, OnDestroy   {
     };
     this.pendingCategoryList.push(data);
     this.categoryList.push(data);
+    this.categoryList.sort((a, b) => a.Name.localeCompare(b.Name));
     this.dataService.saveData('pendingCategoryList', this.pendingCategoryList);
     await this.dataService.saveData('categoryList', this.categoryList);
     this.eventEmitterService.hasNewCategories.emit(true);

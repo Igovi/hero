@@ -77,7 +77,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
       await this.sendHeroData(hero, true);
     });
     this.dataService.removeData('pendingHeroList');
-    this.eventEmitterService.isSync.emit(true);
+    this.eventEmitterService.isSync.emit(false);
   }
 
   async loadCategories() {
@@ -143,6 +143,7 @@ export class HeroRegisterComponent implements OnInit, OnDestroy {
     };
     this.pendingHeroList.push(dataPost);
     this.heroList.push(dataGet);
+    this.heroList.sort((a, b) => a.Name.localeCompare(b.Name));
     this.dataService.saveData('pendingHeroList', this.pendingHeroList);
     await this.dataService.saveData('heroList', this.heroList);
     this.eventEmitterService.hasNewHeroes.emit(true);
