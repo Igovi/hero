@@ -70,7 +70,6 @@ export class EditPage implements OnInit {
 
   async ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    console.log(this.router.url);
 
     if (this.router.url.includes('categoria')) {
       this.isCategoryEdit = true
@@ -299,7 +298,6 @@ export class EditPage implements OnInit {
       Category: this.hero.Category,
       Active: this.hero.Active,
     };
-    console.log(this.heroListLocal)
     this.heroListLocal = this.heroListLocal.map(hero =>
       hero.Id === dataToShow.Id ? { ...dataToShow } : hero
     );

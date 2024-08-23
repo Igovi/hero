@@ -196,7 +196,6 @@ export class CategoryListComponent  implements OnInit {
     
   }
   editCategory(category: any) {
-    console.log('Editar herói:', category);
     this.router.navigate([`categoria/${category.Id}`]);
   }
 

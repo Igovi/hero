@@ -156,7 +156,6 @@ export class HeroListComponent implements OnInit {
     this.networkStatusSubscription =
       this.networkService.networkStatus$.subscribe((isOnline) => {
         this.isOnline = isOnline;
-        console.log('Network status updated:', this.isOnline);
         if (!this.isOnline) {
           this.loadStoredHeroes();
         }else{
@@ -172,7 +171,6 @@ export class HeroListComponent implements OnInit {
   }
 
   editHero(hero: any) {
-    console.log('Editar herói:', hero);
     this.router.navigate([`heroi/${hero.Id}`]);
   }
 

@@ -25,7 +25,6 @@ export class SyncService {
     this.networkStatusSubscription =
       this.networkService.networkStatus$.subscribe(async (isOnline) => {
         this.isOnline = isOnline;
-        console.log('Network status updated:', this.isOnline);
         if (this.isOnline) {
           await this.verifySinc();
         }
