@@ -62,6 +62,8 @@ export class HeroListComponent implements OnInit {
       (eventRes) => {
         this.isSync = eventRes;
         if (this.isSync == false) {
+          this.skip = 0;
+          this.infiniteScroll.disabled ? this.take = this.total : this.take = 3;
           this.loadHeroes();
         }
       },

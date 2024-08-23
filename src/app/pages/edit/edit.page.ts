@@ -19,7 +19,7 @@ import { DataService } from 'src/app/services/storage/data.service';
 })
 export class EditPage implements OnInit {
 
-  isCategoryEdit:boolean = false;
+  isCategoryEdit: boolean = false;
 
   hero: Hero = {
     Name: '',
@@ -40,12 +40,14 @@ export class EditPage implements OnInit {
     Id: 0
   }
 
-  category:Category = {
+  category: Category = {
     Name: '',
-    Id:0
+    Id: 0
   }
 
   pendingEditCategoryList: any[] = [];
+
+  pendingEditHeroList: any[] = [];
 
   heroName = '';
 
@@ -53,8 +55,10 @@ export class EditPage implements OnInit {
 
   categoryListLocal: any[] = [];
 
+  heroListLocal: any[] = [];
 
-  id:number = -1;
+
+  id: number = -1;
 
   public isOnline: boolean = true;
 
@@ -62,13 +66,13 @@ export class EditPage implements OnInit {
 
 
 
-  constructor(private networkService: NetworkService,private dataService: DataService,private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService,private toastService:ToastService,private loadingController: LoadingController,private modalController: ModalController) { }
+  constructor(private networkService: NetworkService, private dataService: DataService, private route: ActivatedRoute, private heroProvider: HeroProvider, private categoryProvider: CategoryProvider, private router: Router, private eventEmitterService: EventEmitterService, private toastService: ToastService, private loadingController: LoadingController, private modalController: ModalController) { }
 
   async ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     console.log(this.router.url);
-    
-    if(this.router.url.includes('categoria')){
+
+    if (this.router.url.includes('categoria')) {
       this.isCategoryEdit = true
       this.pendingEditCategoryList = await this.dataService.getData('pendingEditCategoryList');
       await this.dataService.getData('categoryList').then((storedCategoryList) => {
@@ -77,33 +81,71 @@ export class EditPage implements OnInit {
       this.pendingEditCategoryList === null ? (this.pendingEditCategoryList = []) : null;
       this.networkCheck();
       this.isOnline ? this.searchCategoryById(this.id) : this.searchCategoryByIdLocal(this.id)
-    }else{
+    } else {
       this.isCategoryEdit = false;
-      this.searchHeroById(this.id);
-      this.loadCategories();
+      await this.dataService.getData('heroList').then((storedHeroList) => {
+        this.heroListLocal = storedHeroList;
+      });
+      this.pendingEditHeroList = await this.dataService.getData('pendingEditHeroList');
+      this.pendingEditHeroList === null ? (this.pendingEditHeroList = []) : null;
       this.networkCheck();
-    }    
+      if (!this.isOnline) {
+        this.searchHeroByIdLocal(this.id);
+        await this.dataService.getData('fullCategoryList').then((storedCategoryList) => {
+          this.categoryList = storedCategoryList;
+        })
+      } else {
+        this.searchHeroById(this.id);
+        this.loadCategories();
+      }
+
+
+
+
+
+    }
   }
   networkCheck() {
     this.networkStatusSubscription =
       this.networkService.networkStatus$.subscribe((isOnline) => {
         this.isOnline = isOnline;
-        if (this.isOnline && this.pendingEditCategoryList.length !== 0) {
-          this.syncStoredData();
+        if (this.isCategoryEdit) {
+          if (this.isOnline && this.pendingEditCategoryList.length !== 0) {
+            this.syncStoredData();
+          }
+        } else {
+          if (this.isOnline && this.pendingEditHeroList.length !== 0) {
+            this.syncStoredData();
+          }
         }
+
       });
   }
 
   private async syncStoredData() {
     this.eventEmitterService.isSync.emit(true);
-    const pendingData = await this.dataService.getData('pendingEditCategoryList');
-    pendingData.forEach(async (category: any) => {
-      let data = {
-        Name: category.Name,
-      };
-      await this.sendCategoryData(data,category.Id);
-    });
-    this.dataService.removeData('pendingEditCategoryList');
+    if (this.isCategoryEdit) {
+      const pendingData = await this.dataService.getData('pendingEditCategoryList');
+      pendingData.forEach(async (category: any) => {
+        let data = {
+          Name: category.Name,
+        };
+        await this.sendCategoryData(data, category.Id);
+      });
+      this.dataService.removeData('pendingEditCategoryList');
+    }else{
+      const pendingData = await this.dataService.getData('pendingEditHeroList');
+      pendingData.forEach(async (hero: any) => {
+        let data = {
+          Name: hero.Name,
+          CategoryId: hero.CategoryId,
+          Active: hero.Active
+        };
+        await this.sendHeroData(data, hero.Id);
+      });
+      this.dataService.removeData('pendingEditHeroList');
+    }
+
     this.eventEmitterService.isSync.emit(false);
 
   }
@@ -111,8 +153,8 @@ export class EditPage implements OnInit {
   searchHeroById(id: number) {
     this.heroProvider.getById(id).pipe(
       catchError((apiError: any) => {
-        this.toastService.presentToast('Erro ao buscar heroi','danger');
-        
+        this.toastService.presentToast('Erro ao buscar heroi', 'danger');
+
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -129,7 +171,7 @@ export class EditPage implements OnInit {
   searchCategoryById(id: number) {
     this.categoryProvider.getById(id).pipe(
       catchError((apiError: any) => {
-        this.toastService.presentToast('Erro ao buscar categoria','danger');
+        this.toastService.presentToast('Erro ao buscar categoria', 'danger');
         return throwError(() => apiError);
       })
     ).subscribe({
@@ -147,7 +189,13 @@ export class EditPage implements OnInit {
       (category) => category.Id === id
     )!;
   }
-  
+
+  searchHeroByIdLocal(id: number): void {
+    this.hero = this.heroListLocal.find(
+      (hero) => hero.Id === id
+    )!;
+  }
+
 
   async loadCategories() {
     const loading = await this.loadingController.create({
@@ -159,7 +207,7 @@ export class EditPage implements OnInit {
       .get(0, 50)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Erro ao buscar a lista de categorias','danger');
+          this.toastService.presentToast('Erro ao buscar a lista de categorias', 'danger');
           loading.dismiss();
           return throwError(() => apiError);
         })
@@ -175,28 +223,37 @@ export class EditPage implements OnInit {
       });
   }
 
-  onEditHero(form: any) {
-    if (form.valid && this.isOnline) {
-      this.sendHeroData(form, false);
-      // this.eventEmitterService.hasNewHeroes.emit(true);
+  onEditHero(form:any){
+    if (form.valid) {
+      if (this.isOnline) {
+        this.sendHeroData(form);
+
+      } else {
+        this.storeHeroData(form);
+        form.reset();
+        this.modalController.dismiss();
+      }
     } else {
-      // this.isOnline
-      //   ? console.log('Formulário inválido!')
-      //   : this.storeHeroData(form);
+      console.log('Formulário inválido!');
     }
+
   }
-  sendHeroData(form: any, isStored: boolean) {
+  sendHeroData(form: any,id?:number) {
     let data = {
       Name: this.hero.Name,
       CategoryId: this.hero.Category.Id,
       Active: this.hero.Active,
     };
 
+    if(data.Name == null){
+      data = form
+    }
+
     this.heroProvider
-      .put(this.hero.Id, isStored ? form : data)
+      .put(id? id: this.hero.Id,data)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Erro ao editar heroi','danger');
+          this.toastService.presentToast('Erro ao editar heroi', 'danger');
           return throwError(() => apiError);
         })
       )
@@ -205,7 +262,7 @@ export class EditPage implements OnInit {
 
           form.reset();
           this.eventEmitterService.hasNewHeroes.emit(true);
-          this.toastService.presentToast('Heroi editado com sucesso','success');
+          this.toastService.presentToast('Heroi editado com sucesso', 'success');
           this.router.navigate([`heroi`]);
         },
         error: (apiError: any) => {
@@ -214,11 +271,11 @@ export class EditPage implements OnInit {
       });
   }
 
-  onEditCategory(form:any){
+  onEditCategory(form: any) {
     if (form.valid) {
       if (this.isOnline) {
         this.sendCategoryData(form);
-        
+
       } else {
         this.storeCategoryData(form);
         form.reset();
@@ -228,6 +285,30 @@ export class EditPage implements OnInit {
       console.log('Formulário inválido!');
     }
 
+  }
+  async storeHeroData(form: any) {
+    let data = {
+      Id: this.hero.Id,
+      Name: this.hero.Name,
+      CategoryId: this.hero.Category.Id,
+      Active: this.hero.Active,
+    };
+    let dataToShow = {
+      Id: this.hero.Id,
+      Name: this.hero.Name,
+      Category: this.hero.Category,
+      Active: this.hero.Active,
+    };
+    console.log(this.heroListLocal)
+    this.heroListLocal = this.heroListLocal.map(hero =>
+      hero.Id === dataToShow.Id ? { ...dataToShow } : hero
+    );
+    this.pendingEditHeroList.push(data);
+    await this.dataService.saveData('pendingEditHeroList', this.pendingEditHeroList);
+    await this.dataService.saveData('heroList', this.heroListLocal).then(() => {
+      this.eventEmitterService.hasNewHeroes.emit(true);
+      this.router.navigate([`heroi`]);
+    });
   }
 
   async storeCategoryData(form: any) {
@@ -246,20 +327,20 @@ export class EditPage implements OnInit {
     });
   }
 
-  sendCategoryData(form: any,id?:number) {
+  sendCategoryData(form: any, id?: number) {
     let data = {
       name: this.category.Name,
     };
 
-    if(data.name == null){
+    if (data.name == null) {
       data = form;
     }
 
     this.categoryProvider
-      .put(id ? id: this.id, data)
+      .put(id ? id : this.id, data)
       .pipe(
         catchError((apiError: any) => {
-          this.toastService.presentToast('Erro ao editar categoria','danger');
+          this.toastService.presentToast('Erro ao editar categoria', 'danger');
           return throwError(() => apiError);
         })
       )
@@ -268,7 +349,7 @@ export class EditPage implements OnInit {
 
           form.reset();
           this.eventEmitterService.hasNewCategories.emit(true);
-          this.toastService.presentToast('Categoria editada com sucesso','success');
+          this.toastService.presentToast('Categoria editada com sucesso', 'success');
           this.router.navigate([`categoria`]);
         },
         error: (apiError: any) => {
